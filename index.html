@@ -1,0 +1,720 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Legible · lenguaje claro y legibilidad en español</title>
+<meta name="description" content="Pega tu texto y mide su legibilidad en español con el índice INFLESZ. Te marca frases largas, expresiones administrativas, voz pasiva y siglas sin explicar.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap">
+<style>
+/* Layout: texto y texto marcado a la izquierda; puntuación y avisos a la derecha (pegajoso); una columna en móvil. */
+:root {
+  --paper: #f3f6f5;
+  --surface: #ffffff;
+  --ink: #142120;
+  --muted: #53625f;
+  --line: #d3ddda;
+  --accent: #0c5a61;
+  --accent-ink: #ffffff;
+  --accent-soft: #e2efef;
+  --doc: #fffefa;
+  --ok: #1d6f37;
+  --ok-soft: #e3f2e7;
+  --warn: #8a5100;
+  --warn-soft: #fbf0dc;
+  --bad: #a8231b;
+  --bad-soft: #fbe6e4;
+  --hl-rose: #fbe1e6; --hl-rose-line: #b4234a;
+  --hl-violet: #ece4fb; --hl-violet-line: #6a3fb5;
+  --hl-blue: #dfeefc; --hl-blue-line: #1f5f9e;
+  --hl-long: #fbf0dc; --hl-long-line: #8a5100;
+  --font-ui: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-doc: "Literata", Georgia, "Times New Roman", serif;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e1514; --surface: #162120; --ink: #e5eeec; --muted: #9db0ac; --line: #2b3b39;
+    --accent: #6cc6cc; --accent-ink: #062325; --accent-soft: #173335; --doc: #192322;
+    --ok: #74d18f; --ok-soft: #173322; --warn: #f1b75e; --warn-soft: #362812; --bad: #ff8f85; --bad-soft: #3a1b19;
+    --hl-rose: #45202b; --hl-rose-line: #ff8fab;
+    --hl-violet: #2f2547; --hl-violet-line: #c3a5ff;
+    --hl-blue: #1b3047; --hl-blue-line: #8cc4ff;
+    --hl-long: #362812; --hl-long-line: #f1b75e;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0e1514; --surface: #162120; --ink: #e5eeec; --muted: #9db0ac; --line: #2b3b39;
+  --accent: #6cc6cc; --accent-ink: #062325; --accent-soft: #173335; --doc: #192322;
+  --ok: #74d18f; --ok-soft: #173322; --warn: #f1b75e; --warn-soft: #362812; --bad: #ff8f85; --bad-soft: #3a1b19;
+  --hl-rose: #45202b; --hl-rose-line: #ff8fab;
+  --hl-violet: #2f2547; --hl-violet-line: #c3a5ff;
+  --hl-blue: #1b3047; --hl-blue-line: #8cc4ff;
+  --hl-long: #362812; --hl-long-line: #f1b75e;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: var(--font-ui); font-size: 1rem; line-height: 1.55; margin: 0;
+}
+.wrap {
+  max-width: 1240px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 56px;
+}
+a { color: var(--accent); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.skip { position: absolute; left: -9999px; }
+.skip:focus { left: 16px; top: 16px; background: var(--surface); padding: 8px 12px; z-index: 20; }
+.sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+header.top { display: grid; gap: 10px; margin-bottom: 26px; max-width: 70ch; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .02em; color: var(--accent); }
+.brand svg { flex: none; }
+h1 { font-size: clamp(1.7rem, 3.6vw, 2.5rem); line-height: 1.15; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); margin: 0; font-size: 1.08rem; }
+.badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.badge { font-size: .82rem; border: 1px solid var(--line); background: var(--surface); padding: 3px 10px; border-radius: 999px; color: var(--muted); }
+
+.grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); grid-template-areas: "in out" "mk out"; grid-template-rows: auto 1fr; gap: 16px 28px; align-items: start; }
+@media (max-width: 920px) { .grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "in" "out" "mk"; grid-template-rows: auto; } }
+.a-in { grid-area: in; } .a-mk { grid-area: mk; } .a-out { grid-area: out; }
+
+.card { border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 12px; min-width: 0; }
+.card h2 { font-size: 1.05rem; margin: 0; }
+.head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.hint { color: var(--muted); font-size: .88rem; margin: 0; }
+textarea {
+  font: inherit; font-family: var(--font-doc); font-size: 1rem; line-height: 1.6; color: var(--ink); background: var(--doc);
+  border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; width: 100%; min-width: 0; min-height: 260px; resize: vertical;
+}
+textarea:focus { border-color: var(--accent); }
+.btns { display: flex; flex-wrap: wrap; gap: 8px; }
+button.btn {
+  font: inherit; font-weight: 700; font-size: .92rem; cursor: pointer;
+  border-radius: 8px; padding: 8px 14px; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink);
+}
+button.btn.ghost { background: transparent; color: var(--accent); }
+button.btn:disabled { opacity: .6; cursor: default; }
+
+/* Texto marcado */
+.marked {
+  background: var(--doc); border: 1px solid var(--line); border-radius: 4px;
+  padding: clamp(16px, 3vw, 28px); font-family: var(--font-doc); font-size: 1rem; line-height: 1.85;
+  white-space: pre-wrap; overflow-wrap: anywhere; max-height: 70vh; overflow: auto;
+}
+@media (max-width: 920px) { .marked { max-height: none; } }
+.marked:empty::before { content: "Aquí verás tu texto con los avisos marcados."; color: var(--muted); font-family: var(--font-ui); }
+.marked mark { color: inherit; border-radius: 3px; padding: 1px 1px; scroll-margin: 80px; }
+.marked mark:focus { outline: 3px solid var(--accent); outline-offset: 1px; }
+.marked .s-long { background: var(--hl-long); box-shadow: inset 0 -2px 0 var(--hl-long-line); scroll-margin: 80px; }
+.marked .s-long:focus { outline: 3px solid var(--accent); }
+.marked .t-rose { background: var(--hl-rose); box-shadow: inset 0 -2px 0 var(--hl-rose-line); }
+.marked .t-violet { background: var(--hl-violet); box-shadow: inset 0 -2px 0 var(--hl-violet-line); }
+.marked .t-blue { background: var(--hl-blue); box-shadow: inset 0 -2px 0 var(--hl-blue-line); }
+.marked .flash { animation: flash 1.2s ease-out; }
+@keyframes flash { 0%, 40% { outline: 3px solid var(--accent); outline-offset: 2px; } 100% { outline-color: transparent; } }
+.marked.off-larga .s-long, .marked.off-jerga .k-jerga, .marked.off-nominal .k-nominal, .marked.off-pasiva .k-pasiva,
+.marked.off-gerundio .k-gerundio, .marked.off-sigla .k-sigla, .marked.off-mayus .k-mayus { background: transparent; box-shadow: none; }
+.marked.off-larga .s-long > .sr, .marked.off-jerga .k-jerga > .sr, .marked.off-nominal .k-nominal > .sr, .marked.off-pasiva .k-pasiva > .sr,
+.marked.off-gerundio .k-gerundio > .sr, .marked.off-sigla .k-sigla > .sr, .marked.off-mayus .k-mayus > .sr { display: none; }
+
+/* Puntuación */
+aside.out { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 16px; min-width: 0; }
+@media (max-width: 920px) { aside.out { position: static; } }
+.score { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 18px; align-items: center; }
+.score .num { font-size: 3.2rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; grid-row: span 2; }
+.score .lbl { font-size: 1.2rem; font-weight: 700; }
+.score .sub { color: var(--muted); font-size: .9rem; }
+.lv-1 { color: var(--bad); } .lv-2 { color: var(--warn); } .lv-3 { color: var(--ink); } .lv-4, .lv-5 { color: var(--ok); }
+.scale { position: relative; margin-top: 6px; }
+.scale .bar { display: grid; grid-template-columns: 40fr 15fr 10fr 15fr 20fr; height: 10px; border-radius: 999px; overflow: hidden; gap: 2px; }
+.scale .bar span:nth-child(1) { background: var(--bad); }
+.scale .bar span:nth-child(2) { background: var(--warn); }
+.scale .bar span:nth-child(3) { background: var(--muted); }
+.scale .bar span:nth-child(4) { background: var(--ok); opacity: .7; }
+.scale .bar span:nth-child(5) { background: var(--ok); }
+.scale .pin { position: absolute; top: -5px; width: 4px; height: 20px; margin-left: -2px; background: var(--ink); border-radius: 2px; box-shadow: 0 0 0 2px var(--surface); transition: left .3s; }
+.scale .ticks { display: grid; grid-template-columns: 40fr 15fr 10fr 15fr 20fr; font-size: .72rem; color: var(--muted); margin-top: 4px; }
+.scale .ticks span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding-right: 4px; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; }
+@media (max-width: 420px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stats div { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; min-width: 0; }
+.stats dt { font-size: .78rem; color: var(--muted); }
+.stats dd { margin: 0; font-weight: 700; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.note { font-size: .86rem; color: var(--warn); margin: 0; }
+
+/* Avisos */
+.groups { display: grid; gap: 0; }
+.group { border-top: 1px solid var(--line); }
+.group:first-child { border-top: 0; }
+.group > summary { display: flex; align-items: center; gap: 10px; padding: 10px 0; cursor: pointer; list-style: none; }
+.group > summary::-webkit-details-marker { display: none; }
+.group > summary::before { content: "▸"; color: var(--accent); width: 1em; display: inline-block; transition: transform .15s; }
+.group[open] > summary::before { transform: rotate(90deg); }
+.group .g-name { flex: 1; font-weight: 700; }
+.group .g-count { font-variant-numeric: tabular-nums; font-weight: 700; min-width: 2ch; text-align: right; }
+.group .g-count.zero { color: var(--ok); font-weight: 400; }
+.swatch { width: 14px; height: 14px; border-radius: 3px; flex: none; }
+.sw-long { background: var(--hl-long); box-shadow: inset 0 -3px 0 var(--hl-long-line); }
+.sw-rose { background: var(--hl-rose); box-shadow: inset 0 -3px 0 var(--hl-rose-line); }
+.sw-violet { background: var(--hl-violet); box-shadow: inset 0 -3px 0 var(--hl-violet-line); }
+.sw-blue { background: var(--hl-blue); box-shadow: inset 0 -3px 0 var(--hl-blue-line); }
+.sw-none { background: var(--paper); border: 1px dashed var(--line); }
+.g-body { display: grid; gap: 8px; padding: 0 0 12px 1.6em; }
+.g-tip { font-size: .9rem; color: var(--muted); margin: 0; }
+.g-show { display: flex; gap: 8px; align-items: center; font-size: .88rem; cursor: pointer; }
+.g-show input { accent-color: var(--accent); }
+.items { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.items li { font-size: .92rem; }
+.items button {
+  font: inherit; text-align: left; width: 100%; cursor: pointer; color: var(--ink);
+  background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; display: grid; gap: 2px;
+}
+.items button:hover { border-color: var(--accent); }
+.items .q { font-family: var(--font-doc); }
+.items .fix { color: var(--muted); font-size: .86rem; }
+.items .fix strong { color: var(--ink); }
+.more { font-size: .86rem; color: var(--muted); }
+.empty { color: var(--muted); font-size: .92rem; margin: 0; }
+
+.pro {
+  border: 1.5px solid var(--accent); border-radius: var(--radius); background: var(--surface);
+  padding: 16px 18px; display: grid; gap: 10px;
+}
+.pro-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; }
+.pro-head strong { font-size: 1.05rem; }
+.price { font-size: 1.4rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.price small { font-size: .8rem; font-weight: 400; color: var(--muted); }
+.pro ul { margin: 0; padding-left: 1.2em; display: grid; gap: 3px; font-size: .94rem; }
+.pro-thanks { background: var(--accent-soft); border-radius: 8px; padding: 10px 12px; font-size: .94rem; }
+
+.legal { font-size: .86rem; color: var(--muted); border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 6px; }
+.legal p { margin: 0; }
+footer.foot { margin-top: 36px; font-size: .86rem; color: var(--muted); display: grid; gap: 4px; max-width: 80ch; }
+footer.foot p { margin: 0; }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+</style>
+
+</head>
+<body>
+<a class="skip" href="#texto">Saltar al cuadro de texto</a>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M4 7h11M4 12h14M4 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="18.5" cy="17.5" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21.8 20.8l2.7 2.7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+      Legible
+    </div>
+    <h1>¿Se entiende tu texto? Mídelo antes de publicarlo</h1>
+    <p class="lede">Pega un texto en español y obtén su índice de legibilidad INFLESZ. Te marcamos las frases largas, las expresiones administrativas, la voz pasiva y las siglas sin explicar, con una propuesta para cada caso.</p>
+    <div class="badges" aria-label="Características">
+      <span class="badge">Índice INFLESZ</span>
+      <span class="badge">Pautas de lenguaje claro</span>
+      <span class="badge">Gratis y sin registro</span>
+      <span class="badge">Tu texto no sale del navegador</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <section class="card a-in" aria-labelledby="inTitle">
+        <div class="head">
+          <h2 id="inTitle"><label for="texto">Tu texto</label></h2>
+          <div class="btns">
+            <button type="button" class="btn ghost" id="exampleBtn">Probar con un ejemplo</button>
+            <button type="button" class="btn ghost" id="clearBtn">Borrar</button>
+          </div>
+        </div>
+        <textarea id="texto" spellcheck="true" aria-describedby="inHint" placeholder="Pega aquí una carta, un aviso, una página web o cualquier texto en español."></textarea>
+        <p class="hint" id="inHint">El análisis se actualiza mientras escribes. Para un resultado fiable, usa al menos 100 palabras.</p>
+      </section>
+
+      <section class="card a-mk" aria-labelledby="markTitle">
+        <div class="head">
+          <h2 id="markTitle">Tu texto, marcado</h2>
+        </div>
+        <div class="marked" id="marked" tabindex="0" aria-labelledby="markTitle"></div>
+      </section>
+
+    <aside class="out a-out" aria-label="Resultados">
+      <section class="card" aria-labelledby="scoreTitle">
+        <h2 id="scoreTitle">Legibilidad</h2>
+        <div class="score" id="scoreBox">
+          <div class="num" id="scoreNum">–</div>
+          <div class="lbl" id="scoreLbl">Sin texto</div>
+          <div class="sub" id="scoreSub">Índice INFLESZ, de 0 (muy difícil) a 100 (muy fácil).</div>
+        </div>
+        <div class="scale" aria-hidden="true">
+          <div class="bar"><span></span><span></span><span></span><span></span><span></span></div>
+          <div class="pin" id="pin" hidden></div>
+          <div class="ticks"><span>Muy difícil</span><span>Algo difícil</span><span>Normal</span><span>Bastante fácil</span><span>Muy fácil</span></div>
+        </div>
+        <p class="note" id="shortNote" hidden>Con menos de 100 palabras, el índice es solo orientativo.</p>
+        <dl class="stats">
+          <div><dt>Palabras</dt><dd id="stWords">0</dd></div>
+          <div><dt>Frases</dt><dd id="stSent">0</dd></div>
+          <div><dt>Palabras por frase</dt><dd id="stWps">–</dd></div>
+          <div><dt>Sílabas por palabra</dt><dd id="stSpw">–</dd></div>
+          <div><dt>Palabras largas</dt><dd id="stLong">–</dd></div>
+          <div><dt>Tiempo de lectura</dt><dd id="stTime">–</dd></div>
+        </dl>
+      </section>
+
+      <section class="card" aria-labelledby="avTitle">
+        <div class="head">
+          <h2 id="avTitle">Avisos de lenguaje claro</h2>
+          <span class="hint" id="avTotal" role="status"></span>
+        </div>
+        <div class="groups" id="groups"></div>
+      </section>
+
+      <section class="pro" aria-labelledby="proTitle">
+        <div class="pro-head">
+          <strong id="proTitle">Legible Pro · próximamente</strong>
+          <span class="price">7 € <small>al mes, precio previsto</small></span>
+        </div>
+        <ul>
+          <li>Propuesta de reescritura con IA para cada frase difícil, para aceptar o descartar.</li>
+          <li>Documentos largos: sube un Word o un PDF entero.</li>
+          <li>Informe de legibilidad del antes y el después, en PDF accesible, para tu equipo o tu cliente.</li>
+          <li>Glosario propio con los términos de tu organización.</li>
+        </ul>
+        <div><button type="button" class="btn" id="proBtn">Me interesa</button></div>
+        <div class="pro-thanks" id="proThanks" hidden role="status">Gracias, lo tendremos en cuenta. Tu interés nos ayuda a seguir mejorando Legible. Mientras tanto, el análisis es gratis.</div>
+      </section>
+
+      <div class="legal">
+        <p><strong>Importante.</strong> Legible es una ayuda orientativa basada en fórmulas y reglas automáticas: puede equivocarse y no sustituye la revisión de una persona. No evalúa si un texto cumple la norma UNE 153101 de lectura fácil ni ninguna otra norma; esa validación la hacen personas con dificultades de comprensión.</p>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="foot">
+    <p>Cálculo: fórmula de perspicuidad de Szigriszt-Pazos (1993) y escala INFLESZ de Barrio-Cantalejo y colaboradores (2008). Las sílabas se cuentan de forma automática y pueden variar ligeramente.</p>
+    <p>¿Te resulta útil? Puedes apoyar Legible <a href="https://ko-fi.com/jrebate" target="_blank" rel="noopener" data-track="legible-kofi-pie">invitándonos a un café en Ko-fi</a>.</p>
+    <p><strong>Privacidad:</strong> tu texto no sale de tu navegador; lo guardamos solo en este dispositivo para que no lo pierdas. Contamos visitas y clics con <a href="https://www.goatcounter.com/" target="_blank" rel="noopener">GoatCounter</a>, que no usa cookies ni guarda datos personales.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var STORE_KEY = "legible-borrador-v1";
+
+  // Eventos de GoatCounter (sin cookies). Sin el script cargado no hace nada.
+  function track(name, title) {
+    try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: name, title: title, event: true }); } catch (e) {}
+  }
+
+  var EXAMPLE = "Por medio de la presente se le comunica que, de conformidad con lo establecido en la normativa vigente, y con carácter previo a la resolución definitiva del expediente, el interesado deberá proceder a la cumplimentación del formulario de solicitud, que habrá de ser presentado en tiempo y forma ante el órgano competente, sito en la planta segunda del edificio administrativo, a la mayor brevedad posible.\n\nEn el supuesto de que la documentación aportada no reuniera los requisitos exigidos, será requerido al solicitante para que, en un plazo de diez días hábiles, subsane la falta o acompañe los documentos preceptivos, indicándole que, si así no lo hiciera, se le tendrá por desistido de su petición, previa resolución dictada en los términos previstos en la LPACAP.\n\nSi tiene dudas, llámenos al 900 000 000. Le atendemos de lunes a viernes, de 9 a 14 horas.";
+
+  // Expresiones administrativas y su alternativa más clara.
+  var JERGA = [
+    ["por medio de la presente", "quítalo y ve al grano"],
+    ["por la presente", "quítalo y ve al grano"],
+    ["el abajo firmante", "yo"],
+    ["la abajo firmante", "yo"],
+    ["a tenor de", "según"],
+    ["a tenor de lo dispuesto en", "según"],
+    ["de conformidad con", "según"],
+    ["de acuerdo con lo establecido en", "según"],
+    ["con arreglo a", "según"],
+    ["en virtud de", "por o según"],
+    ["en base a", "según o a partir de"],
+    ["a efectos de", "para"],
+    ["a los efectos oportunos", "quítalo o di para qué"],
+    ["al objeto de", "para"],
+    ["con el objeto de", "para"],
+    ["con el fin de", "para"],
+    ["a fin de", "para"],
+    ["en orden a", "para"],
+    ["en aras de", "para"],
+    ["de cara a", "para"],
+    ["con carácter previo a", "antes de"],
+    ["con carácter previo", "antes"],
+    ["con anterioridad a", "antes de"],
+    ["con posterioridad a", "después de"],
+    ["con carácter general", "en general"],
+    ["en el supuesto de que", "si"],
+    ["en el caso de que", "si"],
+    ["en caso de que", "si"],
+    ["siempre y cuando", "si"],
+    ["a la mayor brevedad posible", "lo antes posible o una fecha concreta"],
+    ["a la mayor brevedad", "lo antes posible o una fecha concreta"],
+    ["en tiempo y forma", "dentro del plazo y como se indica"],
+    ["sito en", "situado en o en"],
+    ["sita en", "situada en o en"],
+    ["obrante en", "que está en"],
+    ["obrantes en", "que están en"],
+    ["dar cumplimiento a", "cumplir"],
+    ["dar traslado", "enviar o comunicar"],
+    ["llevar a cabo", "hacer"],
+    ["se llevará a cabo", "se hará"],
+    ["cumplimentar", "rellenar"],
+    ["cumplimente", "rellene"],
+    ["cumplimentación", "rellenar"],
+    ["en lo relativo a", "sobre"],
+    ["en lo referente a", "sobre"],
+    ["en lo que respecta a", "sobre"],
+    ["en relación con", "sobre"],
+    ["con respecto a", "sobre"],
+    ["en la actualidad", "hoy o ahora"],
+    ["a día de hoy", "hoy"],
+    ["en el día de la fecha", "hoy"],
+    ["con motivo de", "por"],
+    ["en cumplimiento de", "para cumplir"],
+    ["habida cuenta de", "como o ya que"],
+    ["toda vez que", "ya que"],
+    ["por cuanto", "porque"],
+    ["a la vista de", "tras ver o según"],
+    ["no obstante", "pero o sin embargo"],
+    ["asimismo", "también"],
+    ["por consiguiente", "por eso"],
+    ["en consecuencia", "por eso"],
+    ["posteriormente", "después"],
+    ["previamente", "antes"],
+    ["mediante", "con o por"],
+    ["susodicho", "este o ese"],
+    ["susodicha", "esta o esa"],
+    ["precitado", "este o ese"],
+    ["precitada", "esta o esa"],
+    ["el interesado", "usted o la persona solicitante"],
+    ["la interesada", "usted o la persona solicitante"],
+    ["los interesados", "ustedes o las personas solicitantes"],
+    ["aperturar", "abrir"],
+    ["recepcionar", "recibir"],
+    ["se le tendrá por desistido", "entenderemos que renuncia"],
+    ["se le tendrá por desistida", "entenderemos que renuncia"],
+    ["normativa vigente", "nombra la norma concreta"],
+    ["órgano competente", "nombra la unidad u oficina"],
+    ["preceptivo", "obligatorio"],
+    ["preceptivos", "obligatorios"],
+    ["preceptiva", "obligatoria"],
+    ["preceptivas", "obligatorias"],
+    ["subsane", "corrija"],
+    ["subsanar", "corregir"],
+    ["subsanación", "corrección"],
+    ["ad hoc", "específico"],
+    ["sine die", "sin fecha"],
+    ["a priori", "en principio"],
+    ["grosso modo", "más o menos"]
+  ];
+  // Lo más largo primero para que gane la coincidencia más completa.
+  JERGA.sort(function (a, b) { return b[0].length - a[0].length; });
+
+  var L = "\\p{L}";
+  function phraseRe(p) { return p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+"); }
+  var JERGA_RE = new RegExp("(?<!" + L + ")(?:" + JERGA.map(function (j) { return "(" + phraseRe(j[0]) + ")"; }).join("|") + ")(?!" + L + ")", "giu");
+
+  var PASIVA_RE = new RegExp("(?<!" + L + ")(?:es|son|fue|fueron|era|eran|será|serán|sería|serían|sea|sean|fuera|fueran|fuese|fuesen|ser|sido|siendo)\\s+(" + L + "+(?:ado|ada|ados|adas|ido|ida|idos|idas))(?!" + L + ")", "giu");
+  var PASIVA_NO = /^(nada|cada|toda|vida|medida|medidas|salida|salidas|partida|comida|bebida|llegada|entrada|entradas|jornada|década|mirada|morada|ida|temporada|posada|oleada|cuñado|cuñada|lado|grado|estado|pasado|sentido|contenido|partido|apellido|marido|ruido|nido|olvido|vestido|sonido|mercado|abogado|abogada|soldado|cuidado|pecado|helado|prado|dado|todo)$/i;
+
+  var NOMINAL_RE = new RegExp("(?<!" + L + ")(?:realizar|realiza|realice|realicen|realizará|realizarán|efectuar|efectúe|efectúen|efectuará|llevar\\s+a\\s+cabo|proceder\\s+a|procederá\\s+a|procederán\\s+a|procede\\s+a|proceda\\s+a|dar|hacer|haga|hagan|tramitar)\\s+(?:la|el|una|un|los|las)\\s+" + L + "+(?:ción|ciones|sión|siones|miento|mientos)(?!" + L + ")", "giu");
+
+  var GERUNDIO_RE = new RegExp("(?<!" + L + ")" + L + "{2,}(?:ando|iendo|yendo|ándo|iéndo|yéndo)(?:le|les|lo|la|los|las|se|me|te|nos|selo|sela|selos|selas)?(?!" + L + ")", "giu");
+  var GERUNDIO_NO = /^(cuando|comando|comandos|mando|blando|bando|nefando|demando|fernando|orlando|rolando|armando)$/i;
+
+  var SIGLA_RE = /(?<![\p{L}\d])[A-ZÁÉÍÓÚÑ]{2,7}s?(?![\p{L}\d])/gu;
+  var ROMANO = /^[IVXLCDM]+$/;
+  var MAYUS_RE = /(?<![\p{L}])[A-ZÁÉÍÓÚÑÜ]{2,}(?:[\s,;:]+[A-ZÁÉÍÓÚÑÜ]{2,}){2,}(?![\p{L}])/gu;
+
+  var WORD_RE = /\p{L}+/gu;
+
+  // Recuento de sílabas en español: núcleos vocálicos, con diptongos y triptongos fundidos.
+  var STRONG = "aeoáéíóú";
+  var VOW = "aeiouáéíóúü";
+  function syllables(w) {
+    w = w.toLowerCase().replace(/[^a-záéíóúüñ]/g, "");
+    if (!w) return 0;
+    w = w.replace(/qu(?=[eiéí])/g, "q").replace(/gu(?=[eiéí])/g, "g").replace(/h/g, "").replace(/y(?![aeiouáéíóúü])/g, "i");
+    var n = 0, prev = "";
+    for (var i = 0; i < w.length; i++) {
+      var c = w[i];
+      if (VOW.indexOf(c) >= 0) {
+        if (!prev) n++;
+        else if (STRONG.indexOf(prev) >= 0 && STRONG.indexOf(c) >= 0) n++;
+        prev = c;
+      } else prev = "";
+    }
+    return Math.max(1, n);
+  }
+
+  var ABBR = /^(sr|sra|srta|sres|sras|dr|dra|d|dña|dª|art|arts|núm|n|pág|págs|tel|telf|ud|uds|vd|vds|av|avda|ee|uu|aprox|admón|excmo|excma|ilmo|ilma|prof|profa|lic|ing)$/i;
+
+  // Frases: cortes en . ! ? … y en saltos de línea; ignora abreviaturas y puntos seguidos de minúscula.
+  function splitSentences(t) {
+    var out = [], start = 0, re = /[.!?…]+["»”'’)\]]*(?=\s|$)|\n/g, m;
+    while ((m = re.exec(t))) {
+      var end = m.index + m[0].length;
+      if (m[0][0] === ".") {
+        var before = t.slice(start, m.index).match(/(\p{L}+)$/u);
+        if (before && ABBR.test(before[1])) continue;
+        var next = t.slice(end).match(/^\s*(\S)/);
+        if (next && /[\p{Ll}]/u.test(next[1])) continue;
+      }
+      push(start, m[0] === "\n" ? m.index : end);
+      start = end;
+    }
+    push(start, t.length);
+    function push(a, b) {
+      while (a < b && /\s/.test(t[a])) a++;
+      while (b > a && /\s/.test(t[b - 1])) b--;
+      if (b > a && /\p{L}/u.test(t.slice(a, b))) out.push({ start: a, end: b });
+    }
+    return out;
+  }
+
+  function inflesz(p) {
+    if (p < 40) return [1, "Muy difícil", "Texto para especialistas. Cuesta entenderlo a la mayoría de las personas."];
+    if (p < 55) return [2, "Algo difícil", "Se entiende con esfuerzo. Lo habitual en prensa especializada o textos técnicos."];
+    if (p < 65) return [3, "Normal", "Lo habitual en prensa general. Se puede hacer más fácil para la ciudadanía."];
+    if (p < 80) return [4, "Bastante fácil", "Se lee con facilidad. Buen nivel para textos dirigidos al público general."];
+    return [5, "Muy fácil", "Muy fácil de leer, propio de textos para todas las edades."];
+  }
+
+  var TYPES = [
+    { id: "larga", name: "Frases largas", sw: "sw-long", tip: "Divide cada una en dos o tres frases, con una idea por frase. Como referencia, una media de 15 a 20 palabras por frase se lee con comodidad." },
+    { id: "jerga", name: "Expresiones administrativas", sw: "sw-rose", tip: "Son fórmulas que alargan el texto sin aportar. Usa la alternativa propuesta o una palabra de uso común." },
+    { id: "nominal", name: "Verbos convertidos en sustantivos", sw: "sw-rose", tip: "Usa el verbo directamente: «proceder a la cumplimentación» es «rellenar»; «realizar la inscripción» es «inscribirse»." },
+    { id: "pasiva", name: "Voz pasiva", sw: "sw-violet", tip: "Di quién hace la acción: «será requerido al solicitante» se entiende mejor como «le pediremos»." },
+    { id: "gerundio", name: "Gerundios encadenados", sw: "sw-violet", tip: "Varios gerundios en la misma frase la alargan y la enredan. Prueba con frases separadas o con «y», «para» o «porque»." },
+    { id: "sigla", name: "Siglas sin explicar", sw: "sw-blue", tip: "Escribe qué significa la sigla la primera vez que aparece, con la sigla entre paréntesis." },
+    { id: "mayus", name: "Texto en mayúsculas", sw: "sw-blue", tip: "Las frases enteras en mayúsculas se leen peor. Para destacar, usa la negrita." },
+    { id: "parrafo", name: "Párrafos largos", sw: "sw-none", tip: "Divide el párrafo o convierte las enumeraciones en una lista." }
+  ];
+  var COLOR = { jerga: "t-rose", nominal: "t-rose", pasiva: "t-violet", gerundio: "t-violet", sigla: "t-blue", mayus: "t-blue" };
+  var off = {};
+
+  function analyze(t) {
+    var sents = splitSentences(t);
+    var words = 0, syl = 0, longW = 0;
+    var issues = [];
+    sents.forEach(function (s, i) {
+      var txt = t.slice(s.start, s.end), wc = 0, gers = [], m;
+      WORD_RE.lastIndex = 0;
+      while ((m = WORD_RE.exec(txt))) {
+        var n = syllables(m[0]);
+        wc++; syl += n;
+        if (n >= 4) longW++;
+      }
+      s.words = wc; words += wc;
+      if (wc > 30) issues.push({ type: "larga", start: s.start, end: s.end, sent: i, words: wc });
+      GERUNDIO_RE.lastIndex = 0;
+      while ((m = GERUNDIO_RE.exec(txt))) if (!GERUNDIO_NO.test(m[0])) gers.push(m);
+      if (gers.length >= 2) gers.forEach(function (g) { issues.push({ type: "gerundio", start: s.start + g.index, end: s.start + g.index + g[0].length }); });
+    });
+
+    var m;
+    JERGA_RE.lastIndex = 0;
+    while ((m = JERGA_RE.exec(t))) {
+      for (var k = 1; k < m.length; k++) if (m[k] !== undefined) break;
+      issues.push({ type: "jerga", start: m.index, end: m.index + m[0].length, fix: JERGA[k - 1][1] });
+    }
+    NOMINAL_RE.lastIndex = 0;
+    while ((m = NOMINAL_RE.exec(t))) issues.push({ type: "nominal", start: m.index, end: m.index + m[0].length });
+    PASIVA_RE.lastIndex = 0;
+    while ((m = PASIVA_RE.exec(t))) if (!PASIVA_NO.test(m[1])) issues.push({ type: "pasiva", start: m.index, end: m.index + m[0].length });
+
+    var caps = [];
+    MAYUS_RE.lastIndex = 0;
+    while ((m = MAYUS_RE.exec(t))) { caps.push([m.index, m.index + m[0].length]); issues.push({ type: "mayus", start: m.index, end: m.index + m[0].length }); }
+    var seen = {}, explained = {}, firsts = [];
+    SIGLA_RE.lastIndex = 0;
+    while ((m = SIGLA_RE.exec(t))) {
+      var sg = m[0], a = m.index, b = a + sg.length;
+      if (ROMANO.test(sg) || caps.some(function (c) { return a >= c[0] && b <= c[1]; })) continue;
+      if (t[a - 1] === "(" || /^\s*\(/.test(t.slice(b, b + 3))) explained[sg] = true;
+      if (!seen[sg]) { seen[sg] = true; firsts.push({ type: "sigla", start: a, end: b, sigla: sg }); }
+    }
+    firsts.forEach(function (f) { if (!explained[f.sigla]) issues.push(f); });
+
+    var pRe = /[^\n]+(?:\n(?!\s*\n)[^\n]*)*/g;
+    while ((m = pRe.exec(t))) {
+      var pw = (m[0].match(WORD_RE) || []).length;
+      if (pw > 120) issues.push({ type: "parrafo", start: m.index, end: m.index + m[0].length, words: pw, block: true });
+    }
+
+    var P = words ? 206.835 - 62.3 * (syl / words) - words / Math.max(1, sents.length) : null;
+    return { sents: sents, words: words, syl: syl, longW: longW, issues: issues, P: P };
+  }
+
+  function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+  function fmt(n, d) { return n.toLocaleString("es-ES", { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  function snippet(t, a, b, max) {
+    var s = t.slice(a, b).replace(/\s+/g, " ");
+    if (s.length <= max) return s;
+    return s.slice(0, max).replace(/\s+\S*$/, "") + "…";
+  }
+  function srLabel(it) {
+    if (it.type === "jerga") return " (expresión administrativa; mejor: " + it.fix + ")";
+    if (it.type === "nominal") return " (verbo convertido en sustantivo)";
+    if (it.type === "pasiva") return " (voz pasiva)";
+    if (it.type === "gerundio") return " (gerundio)";
+    if (it.type === "sigla") return " (sigla sin explicar)";
+    if (it.type === "mayus") return " (texto en mayúsculas)";
+    return "";
+  }
+
+  // Texto marcado: cada frase larga en un span; dentro, marcas sin solaparse.
+  function renderMarked(t, r) {
+    var inline = r.issues.filter(function (i) { return i.type !== "larga" && !i.block; })
+      .sort(function (a, b) { return a.start - b.start || b.end - a.end; });
+    var longBy = {};
+    r.issues.forEach(function (i) { if (i.type === "larga") longBy[i.sent] = i; });
+    var html = "", pos = 0, k = 0, last = null;
+    r.sents.forEach(function (s, si) {
+      html += esc(t.slice(pos, s.start));
+      var li = longBy[si];
+      if (li) html += '<span class="s-long" id="' + li.id + '" tabindex="-1"><span class="sr">[Frase larga, ' + li.words + ' palabras] </span>';
+      var p = s.start;
+      while (k < inline.length && inline[k].start < s.end) {
+        var it = inline[k++];
+        // Si se solapa con otra marca, el aviso lleva a la marca que lo contiene.
+        if (it.start < p || it.end > s.end) { it.alias = it.start < p && last ? last : li && li.id; continue; }
+        last = it.id;
+        html += esc(t.slice(p, it.start)) + '<mark class="k-' + it.type + " " + COLOR[it.type] + '" id="' + it.id + '" tabindex="-1">' + esc(t.slice(it.start, it.end)) + '<span class="sr">' + esc(srLabel(it)) + "</span></mark>";
+        p = it.end;
+      }
+      html += esc(t.slice(p, s.end));
+      if (li) html += "</span>";
+      pos = s.end;
+    });
+    html += esc(t.slice(pos));
+    $("marked").innerHTML = html;
+  }
+
+  function itemHtml(t, it) {
+    var q, fix = "";
+    if (it.type === "larga") { q = snippet(t, it.start, it.end, 90); fix = it.words + " palabras"; }
+    else if (it.type === "parrafo") { q = snippet(t, it.start, it.end, 90); fix = it.words + " palabras"; }
+    else {
+      q = t.slice(it.start, it.end).replace(/\s+/g, " ");
+      if (it.type === "jerga") fix = "Mejor: <strong>" + esc(it.fix) + "</strong>";
+    }
+    var target = it.block ? "" : ' data-target="' + (it.alias || it.id) + '"';
+    return '<li><button type="button"' + target + '><span class="q">«' + esc(q) + "»</span>" + (fix ? '<span class="fix">' + fix + "</span>" : "") + "</button></li>";
+  }
+
+  var openGroups = {};
+  function renderGroups(t, r) {
+    var by = {};
+    TYPES.forEach(function (ty) { by[ty.id] = []; });
+    r.issues.forEach(function (it) { by[it.type].push(it); });
+    var total = 0, html = "";
+    TYPES.forEach(function (ty) {
+      var list = by[ty.id].sort(function (a, b) { return a.start - b.start; });
+      total += list.length;
+      var max = 12, shown = list.slice(0, max);
+      html += '<details class="group" data-g="' + ty.id + '"' + (openGroups[ty.id] && list.length ? " open" : "") + ">" +
+        '<summary><span class="swatch ' + ty.sw + '" aria-hidden="true"></span><span class="g-name">' + ty.name + '</span><span class="g-count' + (list.length ? "" : " zero") + '">' + (list.length || "0") + "</span></summary>" +
+        '<div class="g-body"><p class="g-tip">' + ty.tip + "</p>" +
+        (list.length && ty.id !== "parrafo" ? '<label class="g-show"><input type="checkbox" data-toggle="' + ty.id + '"' + (off[ty.id] ? "" : " checked") + "> Marcar en el texto</label>" : "") +
+        (list.length ? '<ul class="items">' + shown.map(function (it) { return itemHtml(t, it); }).join("") + "</ul>" : '<p class="empty">Ninguno. Bien.</p>') +
+        (list.length > max ? '<p class="more">Y ' + (list.length - max) + " más en el texto marcado.</p>" : "") +
+        "</div></details>";
+    });
+    $("groups").innerHTML = html;
+    $("avTotal").textContent = r.words ? (total === 1 ? "1 aviso" : total + " avisos") : "";
+  }
+
+  var tracked = false;
+  function render() {
+    var t = $("texto").value;
+    var r = analyze(t);
+    r.issues.forEach(function (it, i) { it.id = "av-" + i; });
+    renderMarked(t, r);
+    renderGroups(t, r);
+
+    var hasScore = r.words >= 5 && r.P !== null;
+    var P = hasScore ? Math.max(0, Math.min(100, r.P)) : null;
+    $("scoreBox").className = "score";
+    if (hasScore) {
+      var lv = inflesz(P);
+      $("scoreNum").textContent = fmt(P, 0);
+      $("scoreNum").className = "num lv-" + lv[0];
+      $("scoreLbl").textContent = lv[1];
+      $("scoreLbl").className = "lbl lv-" + lv[0];
+      $("scoreSub").textContent = lv[2];
+      $("pin").hidden = false;
+      $("pin").style.left = P + "%";
+    } else {
+      $("scoreNum").textContent = "–"; $("scoreNum").className = "num";
+      $("scoreLbl").textContent = r.words ? "Texto muy corto" : "Sin texto"; $("scoreLbl").className = "lbl";
+      $("scoreSub").textContent = "Índice INFLESZ, de 0 (muy difícil) a 100 (muy fácil).";
+      $("pin").hidden = true;
+    }
+    $("shortNote").hidden = !(hasScore && r.words < 100);
+    $("stWords").textContent = fmt(r.words, 0);
+    $("stSent").textContent = fmt(r.sents.length, 0);
+    $("stWps").textContent = r.sents.length ? fmt(r.words / r.sents.length, 1) : "–";
+    $("stSpw").textContent = r.words ? fmt(r.syl / r.words, 2) : "–";
+    $("stLong").textContent = r.words ? fmt(100 * r.longW / r.words, 0) + " %" : "–";
+    var min = r.words / 200;
+    $("stTime").textContent = !r.words ? "–" : min < 1 ? "< 1 min" : fmt(Math.round(min), 0) + " min";
+
+    if (!tracked && r.words >= 30) { tracked = true; track("legible-analizar", "Analizar texto"); }
+    try { localStorage.setItem(STORE_KEY, t); } catch (e) {}
+  }
+
+  var timer;
+  $("texto").addEventListener("input", function () { clearTimeout(timer); timer = setTimeout(render, 250); });
+
+  $("groups").addEventListener("toggle", function (e) {
+    if (e.target.dataset && e.target.dataset.g) openGroups[e.target.dataset.g] = e.target.open;
+  }, true);
+  $("groups").addEventListener("change", function (e) {
+    var id = e.target.dataset.toggle;
+    if (!id) return;
+    off[id] = !e.target.checked;
+    $("marked").classList.toggle("off-" + id, off[id]);
+  });
+  $("groups").addEventListener("click", function (e) {
+    var b = e.target.closest("button[data-target]");
+    if (!b) return;
+    var el = $(b.dataset.target);
+    if (!el) return;
+    el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+    el.focus({ preventScroll: true });
+    el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash");
+  });
+
+  $("exampleBtn").addEventListener("click", function () {
+    $("texto").value = EXAMPLE;
+    openGroups = { larga: true, jerga: true };
+    render();
+    track("legible-ejemplo", "Probar con un ejemplo");
+  });
+  $("clearBtn").addEventListener("click", function () {
+    $("texto").value = "";
+    render();
+    $("texto").focus();
+  });
+
+  document.querySelectorAll("a[data-track]").forEach(function (a) {
+    a.addEventListener("click", function () { track(a.dataset.track, "Ko-fi"); });
+  });
+  $("proBtn").addEventListener("click", function () {
+    $("proThanks").hidden = false;
+    $("proBtn").disabled = true;
+    track("legible-pro-me-interesa", "Legible Pro: me interesa");
+  });
+
+  var saved = "";
+  try { saved = localStorage.getItem(STORE_KEY) || ""; } catch (e) {}
+  // Sin borrador guardado, arranca con el ejemplo para enseñar qué hace.
+  if (saved.trim()) $("texto").value = saved;
+  else { $("texto").value = EXAMPLE; openGroups = { larga: true, jerga: true }; }
+  render();
+})();
+</script>
+<!-- GoatCounter (analítica sin cookies). -->
+<script data-goatcounter="https://jrebate.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
+</body>
+</html>
