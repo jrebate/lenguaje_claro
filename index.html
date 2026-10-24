@@ -121,9 +121,11 @@ button.btn:disabled { opacity: .6; cursor: default; }
 .marked .flash { animation: flash 1.2s ease-out; }
 @keyframes flash { 0%, 40% { outline: 3px solid var(--accent); outline-offset: 2px; } 100% { outline-color: transparent; } }
 .marked.off-larga .s-long, .marked.off-jerga .k-jerga, .marked.off-nominal .k-nominal, .marked.off-pasiva .k-pasiva,
-.marked.off-gerundio .k-gerundio, .marked.off-sigla .k-sigla, .marked.off-mayus .k-mayus { background: transparent; box-shadow: none; }
+.marked.off-gerundio .k-gerundio, .marked.off-sigla .k-sigla, .marked.off-mayus .k-mayus,
+.marked.off-palabra .k-palabra, .marked.off-construccion .k-construccion, .marked.off-signos .k-signos { background: transparent; box-shadow: none; }
 .marked.off-larga .s-long > .sr, .marked.off-jerga .k-jerga > .sr, .marked.off-nominal .k-nominal > .sr, .marked.off-pasiva .k-pasiva > .sr,
-.marked.off-gerundio .k-gerundio > .sr, .marked.off-sigla .k-sigla > .sr, .marked.off-mayus .k-mayus > .sr { display: none; }
+.marked.off-gerundio .k-gerundio > .sr, .marked.off-sigla .k-sigla > .sr, .marked.off-mayus .k-mayus > .sr,
+.marked.off-palabra .k-palabra > .sr, .marked.off-construccion .k-construccion > .sr, .marked.off-signos .k-signos > .sr { display: none; }
 
 /* Puntuación */
 aside.out { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 16px; min-width: 0; }
@@ -290,12 +292,14 @@ footer.foot p { margin: 0; }
 
       <div class="legal">
         <p><strong>Importante.</strong> Legible es una ayuda orientativa basada en fórmulas y reglas automáticas: puede equivocarse y no sustituye la revisión de una persona. No evalúa si un texto cumple la norma UNE 153101 de lectura fácil ni ninguna otra norma; esa validación la hacen personas con dificultades de comprensión.</p>
+        <p>Los índices de legibilidad solo miden la forma (sílabas y longitud de las frases). No saben si el contenido está bien ordenado ni si responde a lo que necesita quien lee.</p>
       </div>
     </aside>
   </div>
 
   <footer class="foot">
     <p>Cálculo: fórmula de perspicuidad de Szigriszt-Pazos (1993) y escala INFLESZ de Barrio-Cantalejo y colaboradores (2008). Las sílabas se cuentan de forma automática y pueden variar ligeramente.</p>
+    <p>Los avisos se inspiran en pautas públicas de lenguaje claro: la <cite>Guía panhispánica de lenguaje claro y accesible</cite> (RAE y ASALE, 2024), la norma UNE-ISO 24495-1:2024, la <cite>Guía de comunicación clara</cite> de la Comunidad de Madrid, la <cite>Guía de lenguaje claro</cite> de la Región de Murcia (2022) y <cite>Lectura fácil y web comprensible</cite> (Bello Rivas y García Muñoz, 2026). Las alternativas propuestas y los textos de Legible son nuestros; ninguna de estas entidades participa en la herramienta ni la respalda.</p>
     <p>¿Te resulta útil? Puedes apoyar Legible <a href="https://ko-fi.com/jrebate" target="_blank" rel="noopener" data-track="legible-kofi-pie">invitándonos a un café en Ko-fi</a>.</p>
     <p><strong>Privacidad:</strong> tu texto no sale de tu navegador; lo guardamos solo en este dispositivo para que no lo pierdas. Contamos visitas y clics con <a href="https://www.goatcounter.com/" target="_blank" rel="noopener">GoatCounter</a>, que no usa cookies ni guarda datos personales.</p>
   </footer>
@@ -313,7 +317,7 @@ footer.foot p { margin: 0; }
     try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: name, title: title, event: true }); } catch (e) {}
   }
 
-  var EXAMPLE = "Por medio de la presente se le comunica que, de conformidad con lo establecido en la normativa vigente, y con carácter previo a la resolución definitiva del expediente, el interesado deberá proceder a la cumplimentación del formulario de solicitud, que habrá de ser presentado en tiempo y forma ante el órgano competente, sito en la planta segunda del edificio administrativo, a la mayor brevedad posible.\n\nEn el supuesto de que la documentación aportada no reuniera los requisitos exigidos, será requerido al solicitante para que, en un plazo de diez días hábiles, subsane la falta o acompañe los documentos preceptivos, indicándole que, si así no lo hiciera, se le tendrá por desistido de su petición, previa resolución dictada en los términos previstos en la LPACAP.\n\nSi tiene dudas, llámenos al 900 000 000. Le atendemos de lunes a viernes, de 9 a 14 horas.";
+  var EXAMPLE = "Por medio de la presente se le comunica que, de conformidad con lo establecido en la normativa vigente, y con carácter previo a la resolución definitiva del expediente, el/la interesado/a deberá proceder a la cumplimentación del formulario de solicitud, que habrá de ser presentado en tiempo y forma ante el órgano competente, sito en la planta segunda del edificio administrativo, a la mayor brevedad posible.\n\nEn el supuesto de que la documentación aportada no reuniera los requisitos exigidos, será requerido al solicitante para que, en un plazo de diez días hábiles, subsane la falta o acompañe los documentos preceptivos, indicándole que, si así no lo hiciere, se le tendrá por desistido de su petición, previa resolución dictada en los términos previstos en la LPACAP.\n\nSi tiene dudas, llámenos al 900 000 000. Le atendemos de lunes a viernes, de 9 a 14 horas.";
 
   // Expresiones administrativas y su alternativa más clara.
   var JERGA = [
@@ -404,14 +408,69 @@ footer.foot p { margin: 0; }
     ["ad hoc", "específico"],
     ["sine die", "sin fecha"],
     ["a priori", "en principio"],
-    ["grosso modo", "más o menos"]
+    ["grosso modo", "más o menos"],
+    ["dar información", "informar"],
+    ["dar trámite", "tramitar"],
+    ["dar curso", "cursar o tramitar"],
+    ["presentar recurso", "recurrir"],
+    ["interponer recurso", "recurrir"],
+    ["interponer un recurso", "recurrir"],
+    ["hacer manifestación", "manifestar o decir"],
+    ["hacer mención", "mencionar"],
+    ["hacer entrega", "entregar"],
+    ["hacer uso", "usar"],
+    ["tomar en consideración", "tener en cuenta"],
+    ["poner de manifiesto", "mostrar o decir"],
+    ["por la razón de que", "porque"],
+    ["debido al hecho de que", "porque"],
+    ["a pesar del hecho de que", "aunque"],
+    ["conforme a", "según"],
+    ["el derecho que le asiste", "su derecho"],
+    ["el derecho que les asiste", "su derecho"],
+    ["por esta mi sentencia", "quítalo"]
   ];
+
+  // Palabras rebuscadas, arcaicas o latinismos y su alternativa común.
+  var PALABRAS = [
+    ["recepcionar", "recibir"], ["recepcione", "reciba"], ["recepcionado", "recibido"], ["recepcionada", "recibida"],
+    ["concretizar", "concretar"], ["influenciar", "influir"], ["basamentar", "basar"], ["circularizar", "circular"],
+    ["conflictividad", "conflicto"], ["inmediatividad", "inmediatez"], ["colapsación", "colapso"],
+    ["obstruccionamiento", "obstrucción"], ["xenofobismo", "xenofobia"], ["problemática", "problema"],
+    ["temática", "tema"], ["finalidad", "fin u objetivo"], ["ejercitar el derecho", "ejercer el derecho"],
+    ["incoar", "iniciar"], ["incoado", "iniciado"], ["incoada", "iniciada"], ["incoación", "inicio"],
+    ["personarse", "presentarse o acudir"], ["persónese", "preséntese"], ["fehaciente", "que lo demuestre"],
+    ["fehacientemente", "de forma que quede demostrado"], ["otrosí", "además"], ["empero", "pero"],
+    ["amén de", "además de"],     ["in situ", "en el lugar"], ["motu proprio", "por iniciativa propia"], ["statu quo", "la situación actual"],
+    ["sensu stricto", "en sentido estricto"], ["ex novo", "desde el principio"], ["mutatis mutandis", "con los cambios necesarios"],
+    ["ope legis", "por ley"], ["inaudita parte", "sin oír a la otra parte"],
+    ["ab initio", "desde el principio"], ["in extremis", "en el último momento"]
+  ];
+  PALABRAS.sort(function (a, b) { return b[0].length - a[0].length; });
   // Lo más largo primero para que gane la coincidencia más completa.
   JERGA.sort(function (a, b) { return b[0].length - a[0].length; });
 
   var L = "\\p{L}";
   function phraseRe(p) { return p.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/ /g, "\\s+"); }
   var JERGA_RE = new RegExp("(?<!" + L + ")(?:" + JERGA.map(function (j) { return "(" + phraseRe(j[0]) + ")"; }).join("|") + ")(?!" + L + ")", "giu");
+
+  var PALABRAS_RE = new RegExp("(?<!" + L + ")(?:" + PALABRAS.map(function (j) { return "(" + phraseRe(j[0]) + ")"; }).join("|") + ")(?!" + L + ")", "giu");
+
+  // Construcciones de estilo jurídico: futuro de subjuntivo, imperativo impersonal, «sustantivo + a + infinitivo».
+  var CONSTRUCCIONES = [
+    { re: new RegExp("(?<!" + L + ")(?:hubiere|hubieren|fuere|fueren|tuviere|tuvieren|pudiere|pudieren|hiciere|hicieren|dijere|dijeren|estuviere|estuvieren|resultare|resultaren|procediere|procedieren|correspondiere|correspondieren|considerare|considerase|" + L + "+(?:ciere|cieren|diere|dieren|biere|bieren|viere|vieren|niere|nieren|liere|lieren|piere|pieren|tiere|tieren))(?!" + L + ")", "giu"),
+      no: /^(quiere|quieren|requiere|requieren|adquiere|adquieren|inquiere|tiene|viene|hiere|hieren|muere|mueren|prefiere|prefieren|refiere|refieren|sugiere|sugieren|difiere|difieren|confiere|confieren|transfiere|transfieren|infiere|infieren|interfiere|interfieren|digiere|digieren|pliere)$/i,
+      fix: "usa el presente: «si procediere» es «si procede»" },
+    { re: new RegExp("(?<!" + L + ")(?:notifíquese|notifíquense|publíquese|publíquense|comuníquese|comuníquense|cúmplase|archívese|archívense|líbrese|líbrense|expídase|insértese|dese traslado|dése traslado|hágase saber)(?!" + L + ")", "giu"),
+      fix: "di quién lo hace: «notifíquese» es «le notificaremos»" },
+    { re: new RegExp("(?<!" + L + ")(?:asuntos|asunto|temas|tema|cuestiones|cuestión|puntos|punto|problemas|problema|pasos|aspectos|requisitos|recursos|documentos|documentación|medidas|objetivos|cantidad|cantidades|importe|importes|precio|tareas|trámites|datos)\\s+a\\s+" + L + "+(?:ar|er|ir)(?!" + L + ")", "giu"),
+      fix: "«temas a tratar» es «temas que hay que tratar» o «temas para tratar»" },
+    { re: new RegExp("(?<!" + L + ")de\\s+conformidad\\s+a(?!" + L + ")", "giu"),
+      fix: "la forma correcta es «de conformidad con», y más claro, «según»" }
+  ];
+
+  // Desdoblamientos con arroba, equis o barra: los lectores de pantalla los leen mal.
+  var SIGNOS_RE = new RegExp("(?<![\\p{L}@./])(?:" + L + "+@" + L + "*|" + L + "*[bcdfgjklmnñprstvz]xs?|" + L + "+\\/(?:as?|os?|es))(?!" + L + ")", "gu");
+  var SIGNOS_NO = /^(y\/o|marx)$/i;
 
   var PASIVA_RE = new RegExp("(?<!" + L + ")(?:es|son|fue|fueron|era|eran|será|serán|sería|serían|sea|sean|fuera|fueran|fuese|fuesen|ser|sido|siendo)\\s+(" + L + "+(?:ado|ada|ados|adas|ido|ida|idos|idas))(?!" + L + ")", "giu");
   var PASIVA_NO = /^(nada|cada|toda|vida|medida|medidas|salida|salidas|partida|comida|bebida|llegada|entrada|entradas|jornada|década|mirada|morada|ida|temporada|posada|oleada|cuñado|cuñada|lado|grado|estado|pasado|sentido|contenido|partido|apellido|marido|ruido|nido|olvido|vestido|sonido|mercado|abogado|abogada|soldado|cuidado|pecado|helado|prado|dado|todo)$/i;
@@ -482,14 +541,17 @@ footer.foot p { margin: 0; }
   var TYPES = [
     { id: "larga", name: "Frases largas", sw: "sw-long", tip: "Divide cada una en dos o tres frases, con una idea por frase. Como referencia, una media de 15 a 20 palabras por frase se lee con comodidad." },
     { id: "jerga", name: "Expresiones administrativas", sw: "sw-rose", tip: "Son fórmulas que alargan el texto sin aportar. Usa la alternativa propuesta o una palabra de uso común." },
+    { id: "palabra", name: "Palabras rebuscadas o latinismos", sw: "sw-rose", tip: "Elige la palabra más corta y común. Si un latinismo o un término técnico es imprescindible, explícalo la primera vez." },
     { id: "nominal", name: "Verbos convertidos en sustantivos", sw: "sw-rose", tip: "Usa el verbo directamente: «proceder a la cumplimentación» es «rellenar»; «realizar la inscripción» es «inscribirse»." },
     { id: "pasiva", name: "Voz pasiva", sw: "sw-violet", tip: "Di quién hace la acción: «será requerido al solicitante» se entiende mejor como «le pediremos»." },
+    { id: "construccion", name: "Fórmulas de estilo jurídico", sw: "sw-violet", tip: "El futuro de subjuntivo («si hubiere»), el imperativo impersonal («notifíquese») y «temas a tratar» suenan antiguos y distantes. Usa el presente y di quién hace cada cosa." },
     { id: "gerundio", name: "Gerundios encadenados", sw: "sw-violet", tip: "Varios gerundios en la misma frase la alargan y la enredan. Prueba con frases separadas o con «y», «para» o «porque»." },
     { id: "sigla", name: "Siglas sin explicar", sw: "sw-blue", tip: "Escribe qué significa la sigla la primera vez que aparece, con la sigla entre paréntesis." },
+    { id: "signos", name: "Arroba, equis o barra en las palabras", sw: "sw-blue", tip: "Los lectores de pantalla leen mal «tod@s», «todxs» o «interesado/a», y cortan la lectura. Usa palabras genéricas: «la ciudadanía», «el profesorado», «las personas solicitantes»." },
     { id: "mayus", name: "Texto en mayúsculas", sw: "sw-blue", tip: "Las frases enteras en mayúsculas se leen peor. Para destacar, usa la negrita." },
     { id: "parrafo", name: "Párrafos largos", sw: "sw-none", tip: "Divide el párrafo o convierte las enumeraciones en una lista." }
   ];
-  var COLOR = { jerga: "t-rose", nominal: "t-rose", pasiva: "t-violet", gerundio: "t-violet", sigla: "t-blue", mayus: "t-blue" };
+  var COLOR = { jerga: "t-rose", palabra: "t-rose", nominal: "t-rose", pasiva: "t-violet", construccion: "t-violet", gerundio: "t-violet", sigla: "t-blue", signos: "t-blue", mayus: "t-blue" };
   var off = {};
 
   function analyze(t) {
@@ -517,6 +579,18 @@ footer.foot p { margin: 0; }
       for (var k = 1; k < m.length; k++) if (m[k] !== undefined) break;
       issues.push({ type: "jerga", start: m.index, end: m.index + m[0].length, fix: JERGA[k - 1][1] });
     }
+    PALABRAS_RE.lastIndex = 0;
+    while ((m = PALABRAS_RE.exec(t))) {
+      for (var k2 = 1; k2 < m.length; k2++) if (m[k2] !== undefined) break;
+      issues.push({ type: "palabra", start: m.index, end: m.index + m[0].length, fix: PALABRAS[k2 - 1][1] });
+    }
+    CONSTRUCCIONES.forEach(function (c) {
+      c.re.lastIndex = 0;
+      var mm;
+      while ((mm = c.re.exec(t))) if (!c.no || !c.no.test(mm[0])) issues.push({ type: "construccion", start: mm.index, end: mm.index + mm[0].length, fix: c.fix });
+    });
+    SIGNOS_RE.lastIndex = 0;
+    while ((m = SIGNOS_RE.exec(t))) if (!SIGNOS_NO.test(m[0])) issues.push({ type: "signos", start: m.index, end: m.index + m[0].length });
     NOMINAL_RE.lastIndex = 0;
     while ((m = NOMINAL_RE.exec(t))) issues.push({ type: "nominal", start: m.index, end: m.index + m[0].length });
     PASIVA_RE.lastIndex = 0;
@@ -559,6 +633,9 @@ footer.foot p { margin: 0; }
     if (it.type === "gerundio") return " (gerundio)";
     if (it.type === "sigla") return " (sigla sin explicar)";
     if (it.type === "mayus") return " (texto en mayúsculas)";
+    if (it.type === "palabra") return " (palabra rebuscada; mejor: " + it.fix + ")";
+    if (it.type === "construccion") return " (fórmula de estilo jurídico)";
+    if (it.type === "signos") return " (arroba, equis o barra)";
     return "";
   }
 
@@ -596,7 +673,8 @@ footer.foot p { margin: 0; }
     else if (it.type === "parrafo") { q = snippet(t, it.start, it.end, 90); fix = it.words + " palabras"; }
     else {
       q = t.slice(it.start, it.end).replace(/\s+/g, " ");
-      if (it.type === "jerga") fix = "Mejor: <strong>" + esc(it.fix) + "</strong>";
+      if (it.type === "jerga" || it.type === "palabra") fix = "Mejor: <strong>" + esc(it.fix) + "</strong>";
+      else if (it.type === "construccion") fix = esc(it.fix.charAt(0).toUpperCase() + it.fix.slice(1));
     }
     var target = it.block ? "" : ' data-target="' + (it.alias || it.id) + '"';
     return '<li><button type="button"' + target + '><span class="q">«' + esc(q) + "»</span>" + (fix ? '<span class="fix">' + fix + "</span>" : "") + "</button></li>";
