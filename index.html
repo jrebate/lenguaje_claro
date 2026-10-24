@@ -484,10 +484,16 @@ footer.foot p { margin: 0; }
 @media (min-width: 640px) { .wrap { padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); } }
 @media (min-width: 1024px) { .wrap { padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); } }
 :focus-visible { outline: 2px solid var(--cz-fg); outline-offset: 2px; }
-header.top { gap: 14px; margin-block: 8px 30px; max-width: 72ch; position: relative; }
+/* El texto ocupa el mismo ancho que el resto del contenido; la nota va en su propia columna. */
+header.top { gap: 14px; margin-block: 8px 30px; max-width: none; grid-template-columns: minmax(0, 1fr); }
+header.top .cz-lead { max-width: none; }
 header.top h1 { font-size: clamp(2.25rem, 4.6vw, 4.1rem); }
 .hero-note { --cz-rotate: 3deg; justify-self: start; margin-top: 6px; }
-@media (min-width: 1100px) { .hero-note { position: absolute; right: -230px; top: 30px; margin: 0; } }
+@media (min-width: 920px) {
+  header.top { grid-template-columns: minmax(0, 1fr) auto; column-gap: 48px; }
+  header.top > * { grid-column: 1; }
+  header.top > .hero-note { grid-column: 2; grid-row: 1 / span 3; align-self: center; margin: 0 8px 0 0; }
+}
 .badges { gap: 8px 18px; }
 .badges .cz-badge { gap: 8px; }
 .card { border-radius: var(--cz-radius); border-color: var(--cz-rule); }
@@ -526,7 +532,7 @@ textarea:focus { border-color: var(--cz-fg); outline: none; }
 .pro-head strong { font-family: var(--cz-font-display); font-weight: 600; font-stretch: 92%; font-size: 1.25rem; }
 .price { font-family: var(--cz-font-mono); font-weight: 500; }
 .pro-thanks { background: var(--cz-muted); border-radius: var(--cz-radius); }
-footer.foot { max-width: 80ch; }
+footer.foot { max-width: none; }
 .cz-footer { margin-top: 40px; }
 .cz-footer .cz-hand { font-size: 1.5rem; }
 </style>
