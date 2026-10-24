@@ -7,54 +7,330 @@
 <meta name="description" content="Pega tu texto y mide su legibilidad en español con el índice INFLESZ. Te marca frases largas, expresiones administrativas, voz pasiva y siglas sin explicar.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Literata:opsz,wght@7..72,400;7..72,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..900&family=Inter+Tight:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@500;600&display=swap">
 <style>
-/* Layout: texto y texto marcado a la izquierda; puntuación y avisos a la derecha (pegajoso); una columna en móvil. */
+/*
+ * CentaurUX · CSS base para subproyectos web (v0.1, 24/10/2026)
+ * Research, redesigned.
+ *
+ * Fuente: src/styles.css de centaurux.es (repo jrebate/centaur-lab-chronicles).
+ * Valores copiados tal cual (oklch). Prefijo cz- para no chocar con otros estilos.
+ * Fuentes (pon este <link> en el <head>):
+ *   https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..900&family=Inter+Tight:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Caveat:wght@500;600&display=swap
+ *
+ * Reglas rápidas:
+ *  - Crema y carbón son los dos mundos. Lima es el acento de marca: uno por bloque, siempre de relleno.
+ *  - Violeta solo como punto o detalle, nunca como texto sobre carbón.
+ *  - Nunca escribas colores a mano en un componente: usa siempre las variables.
+ */
+
+/* ---------- Tokens · tema claro (crema) ---------- */
 :root {
-  --paper: #f3f6f5;
-  --surface: #ffffff;
-  --ink: #142120;
-  --muted: #53625f;
-  --line: #d3ddda;
-  --accent: #0c5a61;
-  --accent-ink: #ffffff;
-  --accent-soft: #e2efef;
-  --doc: #fffefa;
-  --ok: #1d6f37;
-  --ok-soft: #e3f2e7;
-  --warn: #8a5100;
-  --warn-soft: #fbf0dc;
-  --bad: #a8231b;
-  --bad-soft: #fbe6e4;
-  --hl-rose: #fbe1e6; --hl-rose-line: #b4234a;
-  --hl-violet: #ece4fb; --hl-violet-line: #6a3fb5;
-  --hl-blue: #dfeefc; --hl-blue-line: #1f5f9e;
-  --hl-long: #fbf0dc; --hl-long-line: #8a5100;
-  --font-ui: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
-  --font-doc: "Literata", Georgia, "Times New Roman", serif;
-  --radius: 10px;
+  --cz-ink: oklch(0.19 0.008 260);          /* #121417 carbón */
+  --cz-cream: oklch(0.949 0.014 92);        /* #f1eee4 crema */
+
+  --cz-bg: oklch(0.949 0.014 92);           /* fondo de página */
+  --cz-fg: oklch(0.19 0.008 260);           /* texto principal */
+  --cz-card: oklch(0.985 0.008 95);         /* #fcfaf4 tarjetas y paneles */
+  --cz-muted: oklch(0.925 0.014 95);        /* #e9e6dc bloques secundarios */
+  --cz-muted-fg: oklch(0.48 0.012 260);     /* #5a5e65 etiquetas, pies, metadatos */
+  --cz-primary: oklch(0.19 0.008 260);      /* botón principal */
+  --cz-on-primary: oklch(0.965 0.012 95);
+  --cz-border: oklch(0.19 0.008 260 / 16%);
+  --cz-input: oklch(0.19 0.008 260 / 24%);
+  --cz-rule: oklch(0.19 0.008 260 / 14%);   /* hairlines y retícula */
+
+  --cz-lime: oklch(0.9 0.19 116);           /* #d9ec39 acento de marca */
+  --cz-on-lime: oklch(0.19 0.008 260);
+  --cz-violet: oklch(0.52 0.21 285);        /* #6449da acento secundario */
+  --cz-on-violet: oklch(0.98 0.005 95);
+  --cz-note: oklch(0.42 0.014 260);         /* tinta de notas a mano */
+  --cz-note-paper: oklch(0.955 0.075 105);  /* #f7f4b9 papel de nota adhesiva */
+  --cz-destructive: oklch(0.55 0.2 27);
+
+  --cz-radius: 0.25rem;                     /* 4px: esquinas casi vivas */
+
+  --cz-font-display: "Archivo", "Helvetica Neue", system-ui, sans-serif;
+  --cz-font-sans: "Inter Tight", "Helvetica Neue", system-ui, sans-serif;
+  --cz-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --cz-font-hand: "Caveat", "Segoe Print", cursive;
+
+  --cz-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --cz-shadow-lift: 6px 6px 0 0 color-mix(in oklab, var(--cz-ink) 88%, transparent);
+
+  color-scheme: light;
 }
+
+/* ---------- Tokens · tema oscuro (carbón) ---------- */
+/* Se aplica con la preferencia del sistema, con data-theme="dark" o con la clase .cz-dark en un bloque. */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --paper: #0e1514; --surface: #162120; --ink: #e5eeec; --muted: #9db0ac; --line: #2b3b39;
-    --accent: #6cc6cc; --accent-ink: #062325; --accent-soft: #173335; --doc: #192322;
-    --ok: #74d18f; --ok-soft: #173322; --warn: #f1b75e; --warn-soft: #362812; --bad: #ff8f85; --bad-soft: #3a1b19;
-    --hl-rose: #45202b; --hl-rose-line: #ff8fab;
-    --hl-violet: #2f2547; --hl-violet-line: #c3a5ff;
-    --hl-blue: #1b3047; --hl-blue-line: #8cc4ff;
-    --hl-long: #362812; --hl-long-line: #f1b75e;
+  :root:not([data-theme="light"]):not(.cz-solo-claro) {
+    --cz-bg: oklch(0.17 0.008 260);
+    --cz-fg: oklch(0.96 0.01 95);
+    --cz-card: oklch(0.22 0.01 260);
+    --cz-muted: oklch(0.26 0.01 260);
+    --cz-muted-fg: oklch(0.72 0.012 260);
+    --cz-primary: oklch(0.96 0.01 95);
+    --cz-on-primary: oklch(0.17 0.008 260);
+    --cz-border: oklch(0.96 0.01 95 / 16%);
+    --cz-input: oklch(0.96 0.01 95 / 22%);
+    --cz-rule: oklch(0.96 0.01 95 / 14%);
+    --cz-note: oklch(0.78 0.012 260);
     color-scheme: dark;
   }
 }
-:root[data-theme="dark"] {
-  --paper: #0e1514; --surface: #162120; --ink: #e5eeec; --muted: #9db0ac; --line: #2b3b39;
-  --accent: #6cc6cc; --accent-ink: #062325; --accent-soft: #173335; --doc: #192322;
-  --ok: #74d18f; --ok-soft: #173322; --warn: #f1b75e; --warn-soft: #362812; --bad: #ff8f85; --bad-soft: #3a1b19;
-  --hl-rose: #45202b; --hl-rose-line: #ff8fab;
-  --hl-violet: #2f2547; --hl-violet-line: #c3a5ff;
-  --hl-blue: #1b3047; --hl-blue-line: #8cc4ff;
-  --hl-long: #362812; --hl-long-line: #f1b75e;
+:root[data-theme="dark"],
+.cz-dark {
+  --cz-bg: oklch(0.17 0.008 260);
+  --cz-fg: oklch(0.96 0.01 95);
+  --cz-card: oklch(0.22 0.01 260);
+  --cz-muted: oklch(0.26 0.01 260);
+  --cz-muted-fg: oklch(0.72 0.012 260);
+  --cz-primary: oklch(0.96 0.01 95);
+  --cz-on-primary: oklch(0.17 0.008 260);
+  --cz-border: oklch(0.96 0.01 95 / 16%);
+  --cz-input: oklch(0.96 0.01 95 / 22%);
+  --cz-rule: oklch(0.96 0.01 95 / 14%);
+  --cz-note: oklch(0.78 0.012 260);
   color-scheme: dark;
+}
+.cz-dark { background: var(--cz-bg); color: var(--cz-fg); }
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--cz-bg);
+  color: var(--cz-fg);
+  font-family: var(--cz-font-sans);
+  font-size: 1rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: var(--cz-lime); color: var(--cz-on-lime); }
+img { max-width: 100%; height: auto; }
+a { color: inherit; text-underline-offset: 3px; }
+:focus-visible { outline: 2px solid var(--cz-fg); outline-offset: 2px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+
+/* Contenedor con margen lateral seguro */
+.cz-wrap {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+@media (min-width: 640px) { .cz-wrap { padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); } }
+@media (min-width: 1024px) { .cz-wrap { padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); } }
+.cz-prose { max-width: 65ch; }
+
+/* ---------- Tipografía ---------- */
+.cz-display-xl {
+  font-family: var(--cz-font-display);
+  font-weight: 800;
+  font-stretch: 88%;
+  line-height: 0.9;
+  letter-spacing: -0.028em;
+  font-size: clamp(2.25rem, 4.6vw, 4.1rem);
+}
+.cz-display-lg {
+  font-family: var(--cz-font-display);
+  font-weight: 600;
+  font-stretch: 92%;
+  line-height: 1.06;
+  letter-spacing: -0.018em;
+  font-size: clamp(1.65rem, 2.7vw, 2.7rem);
+}
+.cz-display-md {
+  font-family: var(--cz-font-display);
+  font-weight: 600;
+  font-stretch: 92%;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  font-size: clamp(1.35rem, 1.8vw, 1.75rem);
+}
+.cz-lead { font-size: 1.125rem; line-height: 1.5; color: var(--cz-muted-fg); max-width: 60ch; }
+.cz-label {
+  font-family: var(--cz-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cz-muted-fg);
+}
+.cz-hand {
+  font-family: var(--cz-font-hand);
+  font-size: 1.25rem;
+  line-height: 1.15;
+  color: var(--cz-note);
+}
+.cz-num { font-family: var(--cz-font-mono); font-variant-numeric: tabular-nums; }
+
+/* ---------- Títulos de sección: cuadrado lima + mono ---------- */
+.cz-section-title { display: flex; align-items: center; gap: 0.75rem; }
+.cz-section-title::before {
+  content: ""; width: 8px; height: 8px; flex: none;
+  border-radius: 2px; background: var(--cz-lime);
+}
+.cz-section-title, .cz-section-title > * {
+  font-family: var(--cz-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ---------- Marcas de énfasis (lima, de una en una) ---------- */
+.cz-highlight {
+  background: color-mix(in oklab, var(--cz-lime) 78%, transparent);
+  color: var(--cz-on-lime);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding: 0 0.06em;
+}
+/* Sobre carbón la transparencia ensucia el lima: va sólido */
+.cz-dark .cz-highlight, :root[data-theme="dark"] .cz-highlight { background: var(--cz-lime); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]):not(.cz-solo-claro) .cz-highlight { background: var(--cz-lime); } }
+.cz-marker { position: relative; isolation: isolate; padding: 0 0.08em 0.12em; }
+.cz-marker::after {
+  content: ""; position: absolute; z-index: -1;
+  left: -0.06em; right: -0.06em; bottom: -0.04em; height: 0.34em;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 10' preserveAspectRatio='none'%3E%3Cpath d='M2 6.8c30-2.4 62-3.4 96-2.6 32 .8 66 2.6 100 1.2 16-.7 30-1.6 40-1' fill='none' stroke='%23d6f24a' stroke-width='2.8' stroke-linecap='round'/%3E%3Cpath d='M8 8.8c34-1.8 70-2.2 108-1.4 32 .7 62 1.2 100 .4' fill='none' stroke='%23d6f24a' stroke-width='1.3' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-size: 100% 100%;
+  transform: rotate(-0.5deg);
+}
+.cz-underline-hand {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 12' preserveAspectRatio='none'%3E%3Cpath d='M1 8.4c26-3.1 52-4.4 79-3.6 30 .9 60 3.4 90 1.4 22-1.5 40-3.7 68-1.2' fill='none' stroke='%23d6f24a' stroke-width='3.4' stroke-linecap='round'/%3E%3Cpath d='M6 10.6c30-2.2 62-2.6 96-1.7 34 1 63 2.1 96 .3' fill='none' stroke='%23d6f24a' stroke-width='1.6' stroke-linecap='round' opacity='.55'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: left calc(100% + 0.28em);
+  background-size: 100% 0.55em;
+  padding-bottom: 0.22em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* ---------- Enlaces con subrayado que se dibuja ---------- */
+.cz-link { position: relative; text-decoration: none; }
+.cz-link::after {
+  content: ""; position: absolute; left: 0; bottom: -2px; height: 1px; width: 100%;
+  background: currentColor; transform: scaleX(0); transform-origin: left;
+  transition: transform 0.35s var(--cz-ease);
+}
+.cz-link:hover::after, .cz-link:focus-visible::after { transform: scaleX(1); }
+
+/* ---------- Botones (pastilla) ---------- */
+.cz-btn {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  border-radius: 999px; border: 1px solid transparent;
+  padding: 0.5rem 1rem;
+  font: 500 0.8125rem/1.2 var(--cz-font-sans);
+  text-decoration: none; cursor: pointer;
+  background: var(--cz-primary); color: var(--cz-on-primary);
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+.cz-btn:hover { background: var(--cz-lime); color: var(--cz-on-lime); }
+.cz-btn .cz-arrow { transition: transform 0.2s; }
+.cz-btn:hover .cz-arrow { transform: translateX(2px); }
+.cz-btn--outline { background: transparent; color: var(--cz-fg); border-color: var(--cz-input); }
+.cz-btn--outline:hover { background: transparent; color: var(--cz-fg); border-color: var(--cz-fg); }
+
+/* ---------- Etiquetas de estado ---------- */
+.cz-badge {
+  display: inline-flex; align-items: center;
+  font-family: var(--cz-font-mono); font-size: 0.625rem;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--cz-fg);
+}
+.cz-badge--ghost { color: var(--cz-muted-fg); }
+.cz-dot { display: inline-block; width: 6px; height: 6px; border-radius: 999px; background: var(--cz-lime); }
+.cz-dot--violet { background: var(--cz-violet); }
+.cz-dot--pulse { animation: cz-blink 2.4s ease-in-out infinite; }
+@keyframes cz-blink { 0%, 62% { opacity: 1; } 70%, 100% { opacity: 0.25; } }
+
+/* ---------- Superficies ---------- */
+.cz-panel { position: relative; overflow: hidden; border: 1px solid var(--cz-border); background: var(--cz-card); }
+.cz-panel.cz-dark { background: var(--cz-bg); }
+.cz-card {
+  border: 1px solid var(--cz-rule); background: var(--cz-card);
+  transition: transform 0.3s var(--cz-ease), box-shadow 0.3s var(--cz-ease), border-color 0.3s ease;
+}
+a.cz-card { display: block; text-decoration: none; color: inherit; }
+.cz-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in oklab, var(--cz-ink) 45%, transparent);
+  box-shadow: 3px 3px 0 0 color-mix(in oklab, var(--cz-ink) 12%, transparent);
+}
+.cz-hairline-y { border-top: 1px solid var(--cz-rule); border-bottom: 1px solid var(--cz-rule); }
+.cz-hairline-frame { outline: 1px solid var(--cz-rule); outline-offset: 6px; }
+.cz-grid-paper {
+  background-image:
+    linear-gradient(to right, var(--cz-rule) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--cz-rule) 1px, transparent 1px);
+  background-size: 96px 96px;
+}
+
+/* ---------- Nota adhesiva (el gesto humano de la marca) ---------- */
+.cz-sticky {
+  display: inline-block;
+  font-family: var(--cz-font-hand); font-size: 1.25rem; line-height: 1.15;
+  padding: 0.75rem 1rem;
+  color: oklch(0.19 0.008 260);             /* siempre tinta carbón: el papel es claro en los dos temas */
+  background-color: var(--cz-note-paper);
+  background-image: radial-gradient(120% 90% at 15% 0%, color-mix(in oklab, white 45%, transparent) 0%, transparent 60%);
+  box-shadow:
+    2px 3px 0 0 color-mix(in oklab, var(--cz-ink) 6%, transparent),
+    6px 10px 18px -10px color-mix(in oklab, var(--cz-ink) 45%, transparent);
+  transform: rotate(var(--cz-rotate, 4deg));
+}
+
+/* ---------- Cabecera y pie ---------- */
+.cz-header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 50; border-bottom: 1px solid var(--cz-border); }
+.cz-header__inner { display: flex; align-items: center; gap: 1.5rem; min-height: 4rem; flex-wrap: wrap; }
+.cz-wordmark { display: inline-flex; align-items: center; gap: 0.625rem; text-decoration: none; color: inherit; }
+.cz-wordmark img, .cz-wordmark svg { height: 28px; width: auto; }
+.cz-wordmark span { font-family: var(--cz-font-display); font-weight: 600; font-stretch: 92%; font-size: 1.35rem; line-height: 1; letter-spacing: -0.01em; }
+.cz-header__tag { font-family: var(--cz-font-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: var(--cz-muted-fg); }
+.cz-header__actions { margin-left: auto; display: flex; gap: 0.5rem; align-items: center; }
+.cz-footer { border-top: 1px solid var(--cz-border); padding-block: 2rem; }
+.cz-footer__inner { display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; align-items: center; justify-content: space-between; }
+
+/* Logo según el fondo: muestra el que toca */
+.cz-logo--light-bg { display: inline; }
+.cz-logo--dark-bg { display: none; }
+.cz-dark .cz-logo--light-bg, :root[data-theme="dark"] .cz-logo--light-bg { display: none; }
+.cz-dark .cz-logo--dark-bg, :root[data-theme="dark"] .cz-logo--dark-bg { display: inline; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]):not(.cz-solo-claro) .cz-logo--light-bg { display: none; }
+  :root:not([data-theme="light"]):not(.cz-solo-claro) .cz-logo--dark-bg { display: inline; }
+}
+
+/* ---------- Movimiento ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- Legible ---------- */
+/* Layout: texto y texto marcado a la izquierda; puntuación y avisos a la derecha (pegajoso); una columna en móvil.
+   Los tokens de Legible son alias de la paleta CentaurUX: así funcionan solos en claro y en oscuro. */
+:root {
+  --paper: var(--cz-bg);
+  --surface: var(--cz-card);
+  --ink: var(--cz-fg);
+  --muted: var(--cz-muted-fg);
+  --line: var(--cz-border);
+  --accent: var(--cz-fg);
+  --accent-ink: var(--cz-on-primary);
+  --accent-soft: var(--cz-muted);
+  --doc: var(--cz-card);
+  --ok: var(--cz-fg);
+  --warn: var(--cz-fg);
+  --bad: var(--cz-destructive);
+  --hl-long: var(--cz-note-paper); --hl-long-line: color-mix(in oklab, var(--cz-ink) 45%, transparent);
+  --hl-rose: color-mix(in oklab, var(--cz-destructive) 16%, transparent); --hl-rose-line: var(--cz-destructive);
+  --hl-violet: color-mix(in oklab, var(--cz-violet) 18%, transparent); --hl-violet-line: var(--cz-violet);
+  --hl-blue: color-mix(in oklab, var(--cz-muted-fg) 22%, transparent); --hl-blue-line: var(--cz-muted-fg);
+  --font-ui: var(--cz-font-sans);
+  --font-doc: var(--cz-font-sans);
+  --radius: var(--cz-radius);
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -202,34 +478,88 @@ aside.out { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); d
 footer.foot { margin-top: 36px; font-size: .86rem; color: var(--muted); display: grid; gap: 4px; max-width: 80ch; }
 footer.foot p { margin: 0; }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+
+/* ---------- Ajustes CentaurUX ---------- */
+.wrap { max-width: 1200px; }
+@media (min-width: 640px) { .wrap { padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); } }
+@media (min-width: 1024px) { .wrap { padding-left: max(32px, env(safe-area-inset-left, 0px)); padding-right: max(32px, env(safe-area-inset-right, 0px)); } }
+:focus-visible { outline: 2px solid var(--cz-fg); outline-offset: 2px; }
+header.top { gap: 14px; margin-block: 8px 30px; max-width: 72ch; position: relative; }
+header.top h1 { font-size: clamp(2.25rem, 4.6vw, 4.1rem); }
+.hero-note { --cz-rotate: 3deg; justify-self: start; margin-top: 6px; }
+@media (min-width: 1100px) { .hero-note { position: absolute; right: -230px; top: 30px; margin: 0; } }
+.badges { gap: 8px 18px; }
+.badges .cz-badge { gap: 8px; }
+.card { border-radius: var(--cz-radius); border-color: var(--cz-rule); }
+.card h2 { font-size: .7rem; }
+.card h2 label { cursor: pointer; }
+textarea, .marked { border-radius: var(--cz-radius); font-size: 1.02rem; }
+textarea { background: var(--cz-bg); border-color: var(--cz-input); }
+textarea:focus { border-color: var(--cz-fg); outline: none; }
+.marked { background: var(--cz-bg); border-color: var(--cz-rule); }
+.marked .s-long { color: var(--cz-ink); }
+.marked mark:focus, .marked .s-long:focus { outline: 2px solid var(--cz-fg); }
+@keyframes flash { 0%, 40% { outline: 2px solid var(--cz-fg); outline-offset: 2px; } 100% { outline-color: transparent; } }
+.score .num { font-family: var(--cz-font-display); font-weight: 800; font-stretch: 88%; font-size: 4rem; letter-spacing: -0.03em; }
+.score .lbl { font-family: var(--cz-font-display); font-weight: 600; font-stretch: 92%; font-size: 1.35rem; }
+.lv-1 { color: var(--cz-destructive); } .lv-2, .lv-3, .lv-4, .lv-5 { color: var(--cz-fg); }
+.scale .bar { border-radius: 2px; }
+.scale .bar span:nth-child(1) { background: var(--cz-destructive); }
+.scale .bar span:nth-child(2) { background: color-mix(in oklab, var(--cz-destructive) 45%, var(--cz-muted)); }
+.scale .bar span:nth-child(3) { background: color-mix(in oklab, var(--cz-muted-fg) 55%, var(--cz-muted)); }
+.scale .bar span:nth-child(4) { background: color-mix(in oklab, var(--cz-lime) 50%, var(--cz-muted)); opacity: 1; }
+.scale .bar span:nth-child(5) { background: var(--cz-lime); }
+.scale .pin { background: var(--cz-fg); box-shadow: 0 0 0 2px var(--cz-card); }
+.scale .ticks, .stats dt { font-family: var(--cz-font-mono); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; }
+.stats div { background: var(--cz-bg); border-color: var(--cz-rule); border-radius: var(--cz-radius); }
+.stats dd { font-family: var(--cz-font-mono); font-weight: 500; }
+.note { color: var(--cz-muted-fg); }
+.group .g-name { font-weight: 600; }
+.group .g-count { font-family: var(--cz-font-mono); font-weight: 500; }
+.group .g-count.zero { color: var(--cz-muted-fg); }
+.group > summary::before { color: var(--cz-fg); }
+.swatch { border-radius: 2px; }
+.g-show input { accent-color: var(--cz-fg); }
+.items button { background: var(--cz-bg); border-color: var(--cz-rule); border-radius: var(--cz-radius); }
+.items button:hover { border-color: var(--cz-fg); }
+.pro { border: 1px solid var(--cz-fg); border-radius: var(--cz-radius); }
+.pro-head strong { font-family: var(--cz-font-display); font-weight: 600; font-stretch: 92%; font-size: 1.25rem; }
+.price { font-family: var(--cz-font-mono); font-weight: 500; }
+.pro-thanks { background: var(--cz-muted); border-radius: var(--cz-radius); }
+footer.foot { max-width: 80ch; }
+.cz-footer { margin-top: 40px; }
+.cz-footer .cz-hand { font-size: 1.5rem; }
 </style>
 
 </head>
 <body>
 <a class="skip" href="#texto">Saltar al cuadro de texto</a>
+<header class="cz-header cz-dark">
+  <div class="cz-wrap cz-header__inner">
+    <a class="cz-wordmark" href="https://centaurux.es" target="_blank" rel="noopener"><img src="assets/centaurux-iso-blanco.png" alt="" width="28" height="28"><span>CentaurUX</span></a>
+    <span class="cz-header__tag">Research, redesigned.</span>
+  </div>
+</header>
 <div class="wrap">
   <header class="top">
-    <div class="brand">
-      <svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M4 7h11M4 12h14M4 17h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="18.5" cy="17.5" r="4.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21.8 20.8l2.7 2.7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-      Legible
-    </div>
-    <h1>¿Se entiende tu texto? Mídelo antes de publicarlo</h1>
-    <p class="lede">Pega un texto en español y obtén su índice de legibilidad INFLESZ. Te marcamos las frases largas, las expresiones administrativas, la voz pasiva y las siglas sin explicar, con una propuesta para cada caso.</p>
+    <div class="brand cz-label">Legible · Lenguaje claro y legibilidad</div>
+    <h1 class="cz-display-xl">¿Se entiende tu texto? Mídelo antes de publicarlo</h1>
+    <p class="lede cz-lead">Pega un texto en español y obtén su índice de legibilidad INFLESZ. Te marcamos las frases largas, las expresiones administrativas, la voz pasiva y las siglas sin explicar, con una propuesta para cada caso.</p>
     <div class="badges" aria-label="Características">
-      <span class="badge">Índice INFLESZ</span>
-      <span class="badge">Pautas de lenguaje claro</span>
-      <span class="badge">Gratis y sin registro</span>
-      <span class="badge">Tu texto no sale del navegador</span>
+      <span class="cz-badge"><span class="cz-dot cz-dot--violet" aria-hidden="true"></span>Índice INFLESZ</span>
+      <span class="cz-badge"><span class="cz-dot cz-dot--violet" aria-hidden="true"></span>Pautas de lenguaje claro</span>
+      <span class="cz-badge"><span class="cz-dot cz-dot--violet" aria-hidden="true"></span>Gratis y sin registro</span>
     </div>
+    <p class="cz-sticky hero-note">Tu texto no sale de tu navegador.</p>
   </header>
 
   <div class="grid">
     <section class="card a-in" aria-labelledby="inTitle">
         <div class="head">
-          <h2 id="inTitle"><label for="texto">Tu texto</label></h2>
+          <h2 id="inTitle" class="cz-section-title"><label for="texto">Tu texto</label></h2>
           <div class="btns">
-            <button type="button" class="btn ghost" id="exampleBtn">Probar con un ejemplo</button>
-            <button type="button" class="btn ghost" id="clearBtn">Borrar</button>
+            <button type="button" class="cz-btn cz-btn--outline" id="exampleBtn">Probar con un ejemplo</button>
+            <button type="button" class="cz-btn cz-btn--outline" id="clearBtn">Borrar</button>
           </div>
         </div>
         <textarea id="texto" spellcheck="true" aria-describedby="inHint" placeholder="Pega aquí una carta, un aviso, una página web o cualquier texto en español."></textarea>
@@ -238,14 +568,14 @@ footer.foot p { margin: 0; }
 
       <section class="card a-mk" aria-labelledby="markTitle">
         <div class="head">
-          <h2 id="markTitle">Tu texto, marcado</h2>
+          <h2 id="markTitle" class="cz-section-title">Tu texto, marcado</h2>
         </div>
         <div class="marked" id="marked" tabindex="0" aria-labelledby="markTitle"></div>
       </section>
 
     <aside class="out a-out" aria-label="Resultados">
       <section class="card" aria-labelledby="scoreTitle">
-        <h2 id="scoreTitle">Legibilidad</h2>
+        <h2 id="scoreTitle" class="cz-label">Legibilidad</h2>
         <div class="score" id="scoreBox">
           <div class="num" id="scoreNum">–</div>
           <div class="lbl" id="scoreLbl">Sin texto</div>
@@ -269,7 +599,7 @@ footer.foot p { margin: 0; }
 
       <section class="card" aria-labelledby="avTitle">
         <div class="head">
-          <h2 id="avTitle">Avisos de lenguaje claro</h2>
+          <h2 id="avTitle" class="cz-section-title">Avisos de lenguaje claro</h2>
           <span class="hint" id="avTotal" role="status"></span>
         </div>
         <div class="groups" id="groups"></div>
@@ -286,7 +616,7 @@ footer.foot p { margin: 0; }
           <li>Informe de legibilidad del antes y el después, en PDF accesible, para tu equipo o tu cliente.</li>
           <li>Glosario propio con los términos de tu organización.</li>
         </ul>
-        <div><button type="button" class="btn" id="proBtn">Me interesa</button></div>
+        <div><button type="button" class="cz-btn" id="proBtn">Me interesa</button></div>
         <div class="pro-thanks" id="proThanks" hidden role="status">Gracias, lo tendremos en cuenta. Tu interés nos ayuda a seguir mejorando Legible. Mientras tanto, el análisis es gratis.</div>
       </section>
 
@@ -302,6 +632,12 @@ footer.foot p { margin: 0; }
     <p>Los avisos se inspiran en pautas públicas de lenguaje claro: la <cite>Guía panhispánica de lenguaje claro y accesible</cite> (RAE y ASALE, 2024), la norma UNE-ISO 24495-1:2024, la <cite>Guía de comunicación clara</cite> de la Comunidad de Madrid, la <cite>Guía de lenguaje claro</cite> de la Región de Murcia (2022) y <cite>Lectura fácil y web comprensible</cite> (Bello Rivas y García Muñoz, 2026). Las alternativas propuestas y los textos de Legible son nuestros; ninguna de estas entidades participa en la herramienta ni la respalda.</p>
     <p>¿Te resulta útil? Puedes apoyar Legible <a href="https://ko-fi.com/jrebate" target="_blank" rel="noopener" data-track="legible-kofi-pie">invitándonos a un café en Ko-fi</a>.</p>
     <p><strong>Privacidad:</strong> tu texto no sale de tu navegador; lo guardamos solo en este dispositivo para que no lo pierdas. Contamos visitas y clics con <a href="https://www.goatcounter.com/" target="_blank" rel="noopener">GoatCounter</a>, que no usa cookies ni guarda datos personales.</p>
+  </footer>
+  <footer class="cz-footer">
+    <div class="cz-footer__inner">
+      <a class="cz-wordmark" href="https://centaurux.es" target="_blank" rel="noopener"><img class="cz-logo--light-bg" src="assets/centaurux-iso-negro.png" alt="" width="28" height="28"><img class="cz-logo--dark-bg" src="assets/centaurux-iso-blanco.png" alt="" width="28" height="28"><span>CentaurUX</span></a>
+      <span class="cz-hand">Human + AI = Centaur</span>
+    </div>
   </footer>
 </div>
 
