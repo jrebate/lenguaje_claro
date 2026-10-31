@@ -358,9 +358,14 @@ h1 { font-size: clamp(1.7rem, 3.6vw, 2.5rem); line-height: 1.15; margin: 0; text
 .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
 .badge { font-size: .82rem; border: 1px solid var(--line); background: var(--surface); padding: 3px 10px; border-radius: 999px; color: var(--muted); }
 
-.grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); grid-template-areas: "in out" "mk out"; grid-template-rows: auto 1fr; gap: 16px 28px; align-items: start; }
-@media (max-width: 920px) { .grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "in" "out" "mk"; grid-template-rows: auto; } }
-.a-in { grid-area: in; } .a-mk { grid-area: mk; } .a-out { grid-area: out; }
+.grid { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); grid-template-areas: "in out" "mk out" "dk out"; grid-template-rows: auto auto 1fr; gap: 16px 28px; align-items: start; }
+@media (max-width: 920px) { .grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "in" "out" "mk" "dk"; grid-template-rows: auto; } }
+.a-in { grid-area: in; } .a-mk { grid-area: mk; } .a-out { grid-area: out; } .a-dk { grid-area: dk; }
+.dk-groups { display: grid; gap: 12px; margin: 0; }
+.dk-groups dt { font-family: var(--cz-font-mono); font-size: .62rem; letter-spacing: .08em; text-transform: uppercase; color: var(--cz-muted-fg); }
+.dk-groups dd { margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.dk-groups dd span { font-size: .92rem; background: var(--cz-bg); border: 1px solid var(--cz-rule); border-radius: var(--cz-radius); padding: 2px 8px; overflow-wrap: anywhere; }
+.dk-groups dd.dk-long { display: grid; gap: 6px; }
 
 .card { border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 16px 18px; display: grid; gap: 12px; min-width: 0; }
 .card h2 { font-size: 1.05rem; margin: 0; }
@@ -398,10 +403,12 @@ button.btn:disabled { opacity: .6; cursor: default; }
 @keyframes flash { 0%, 40% { outline: 3px solid var(--accent); outline-offset: 2px; } 100% { outline-color: transparent; } }
 .marked.off-larga .s-long, .marked.off-jerga .k-jerga, .marked.off-nominal .k-nominal, .marked.off-pasiva .k-pasiva,
 .marked.off-gerundio .k-gerundio, .marked.off-sigla .k-sigla, .marked.off-mayus .k-mayus,
-.marked.off-palabra .k-palabra, .marked.off-construccion .k-construccion, .marked.off-signos .k-signos { background: transparent; box-shadow: none; }
+.marked.off-palabra .k-palabra, .marked.off-construccion .k-construccion, .marked.off-signos .k-signos,
+.marked.off-numero .k-numero, .marked.off-negacion .k-negacion { background: transparent; box-shadow: none; }
 .marked.off-larga .s-long > .sr, .marked.off-jerga .k-jerga > .sr, .marked.off-nominal .k-nominal > .sr, .marked.off-pasiva .k-pasiva > .sr,
 .marked.off-gerundio .k-gerundio > .sr, .marked.off-sigla .k-sigla > .sr, .marked.off-mayus .k-mayus > .sr,
-.marked.off-palabra .k-palabra > .sr, .marked.off-construccion .k-construccion > .sr, .marked.off-signos .k-signos > .sr { display: none; }
+.marked.off-palabra .k-palabra > .sr, .marked.off-construccion .k-construccion > .sr, .marked.off-signos .k-signos > .sr,
+.marked.off-numero .k-numero > .sr, .marked.off-negacion .k-negacion > .sr { display: none; }
 
 /* Puntuación */
 aside.out { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); display: grid; gap: 16px; min-width: 0; }
@@ -583,6 +590,14 @@ footer.foot { max-width: none; }
         <div class="marked" id="marked" tabindex="0" aria-labelledby="markTitle"></div>
       </section>
 
+      <section class="card a-dk" aria-labelledby="dkTitle">
+        <div class="head">
+          <h2 id="dkTitle" class="cz-section-title">Datos clave</h2>
+        </div>
+        <p class="hint">Fechas, plazos, cantidades, contactos y obligaciones que hemos encontrado en tu texto. Si lo reescribes, comprueba que siguen ahí y que no han cambiado.</p>
+        <dl class="dk-groups" id="datos"></dl>
+      </section>
+
     <aside class="out a-out" aria-label="Resultados">
       <section class="card" aria-labelledby="scoreTitle">
         <h2 id="scoreTitle" class="cz-label">Legibilidad</h2>
@@ -621,7 +636,8 @@ footer.foot { max-width: none; }
         </div>
         <p class="pro-ask">¿Pagarías una cantidad simbólica por estas mejoras?</p>
         <ul>
-          <li>Propuesta de reescritura con IA para cada frase difícil, para aceptar o descartar.</li>
+          <li>Reescritura con IA siempre con la misma estructura: lo más importante, qué tienes que hacer y palabras difíciles.</li>
+          <li>Comprobación de fidelidad: te avisa si la nueva versión pierde o cambia fechas, cifras, plazos u obligaciones.</li>
           <li>Documentos largos: sube un Word o un PDF entero.</li>
           <li>Informe de legibilidad del antes y el después, en PDF accesible, para tu equipo o tu cliente.</li>
           <li>Glosario propio con los términos de tu organización.</li>
@@ -642,7 +658,7 @@ footer.foot { max-width: none; }
   </div>
 
   <footer class="foot">
-    <p>Cálculo: fórmula de perspicuidad de Szigriszt-Pazos (1993) y escala INFLESZ de Barrio-Cantalejo y colaboradores (2008). Las sílabas se cuentan de forma automática y pueden variar ligeramente.</p>
+    <p>Cálculo: fórmula de perspicuidad de Szigriszt-Pazos (1993) y escala INFLESZ de Barrio-Cantalejo y colaboradores (2008). Las sílabas se cuentan de forma automática y pueden variar ligeramente. Los índices ayudan a detectar textos difíciles, pero no miden si se entienden: eso solo lo dicen las personas que los leen.</p>
     <p>Los avisos se inspiran en pautas públicas de lenguaje claro: la <cite>Guía panhispánica de lenguaje claro y accesible</cite> (RAE y ASALE, 2024), la norma UNE-ISO 24495-1:2024, la <cite>Guía de comunicación clara</cite> de la Comunidad de Madrid, la <cite>Guía de lenguaje claro</cite> de la Región de Murcia (2022) y <cite>Lectura fácil y web comprensible</cite> (Bello Rivas y García Muñoz, 2026). Las alternativas propuestas y los textos de Legible son nuestros; ninguna de estas entidades participa en la herramienta ni la respalda.</p>
     <p>¿Te resulta útil? Puedes apoyar Legible <a href="https://ko-fi.com/jrebate" target="_blank" rel="noopener" data-track="legible-kofi-pie">invitándonos a un café en Ko-fi</a>.</p>
     <p><strong>Privacidad:</strong> tu texto no sale de tu navegador; lo guardamos solo en este dispositivo para que no lo pierdas. Contamos visitas y clics con <a href="https://www.goatcounter.com/" target="_blank" rel="noopener">GoatCounter</a>, que no usa cookies ni guarda datos personales.</p>
@@ -896,12 +912,49 @@ footer.foot { max-width: none; }
     { id: "pasiva", name: "Voz pasiva", sw: "sw-violet", tip: "Di quién hace la acción: «será requerido al solicitante» se entiende mejor como «le pediremos»." },
     { id: "construccion", name: "Fórmulas de estilo jurídico", sw: "sw-violet", tip: "El futuro de subjuntivo («si hubiere»), el imperativo impersonal («notifíquese») y «temas a tratar» suenan antiguos y distantes. Usa el presente y di quién hace cada cosa." },
     { id: "gerundio", name: "Gerundios encadenados", sw: "sw-violet", tip: "Varios gerundios en la misma frase la alargan y la enredan. Prueba con frases separadas o con «y», «para» o «porque»." },
+    { id: "negacion", name: "Negaciones acumuladas", sw: "sw-violet", tip: "Varias negaciones en la misma frase, o una doble negación («no es imposible»), obligan a releer. Di lo mismo en positivo." },
     { id: "sigla", name: "Siglas sin explicar", sw: "sw-blue", tip: "Escribe qué significa la sigla la primera vez que aparece, con la sigla entre paréntesis." },
     { id: "signos", name: "Arroba, equis o barra en las palabras", sw: "sw-blue", tip: "Los lectores de pantalla leen mal «tod@s», «todxs» o «interesado/a», y cortan la lectura. Usa palabras genéricas: «la ciudadanía», «el profesorado», «las personas solicitantes»." },
     { id: "mayus", name: "Texto en mayúsculas", sw: "sw-blue", tip: "Las frases enteras en mayúsculas se leen peor. Para destacar, usa la negrita." },
+    { id: "numero", name: "Cifras escritas con letras", sw: "sw-blue", tip: "En plazos, cantidades y otros datos, las cifras se localizan y se recuerdan mejor: «10 días» mejor que «diez días»." },
     { id: "parrafo", name: "Párrafos largos", sw: "sw-none", tip: "Divide el párrafo o convierte las enumeraciones en una lista." }
   ];
-  var COLOR = { jerga: "t-rose", palabra: "t-rose", nominal: "t-rose", pasiva: "t-violet", construccion: "t-violet", gerundio: "t-violet", sigla: "t-blue", signos: "t-blue", mayus: "t-blue" };
+  var COLOR = { jerga: "t-rose", palabra: "t-rose", nominal: "t-rose", pasiva: "t-violet", construccion: "t-violet", gerundio: "t-violet", sigla: "t-blue", signos: "t-blue", mayus: "t-blue", negacion: "t-violet", numero: "t-blue" };
+
+  var NUM_PAL = "dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieciséis|diecisiete|dieciocho|diecinueve|veinte|veinti" + L + "+|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|cien|ciento|doscient[oa]s|trescient[oa]s|cuatrocient[oa]s|quinient[oa]s|seiscient[oa]s|setecient[oa]s|ochocient[oa]s|novecient[oa]s|mil";
+  var UNIDAD = "días|día|meses|mes|años|año|semanas|semana|horas|hora|minutos|euros|veces|personas|plazas|páginas|copias|ejemplares";
+  var NUMERO_RE = new RegExp("(?<!" + L + ")(?:" + NUM_PAL + ")(?:\\s+(?:y\\s+)?(?:" + NUM_PAL + "))*\\s+(?:" + UNIDAD + ")(?!" + L + ")", "giu");
+  var NEG_RE = new RegExp("(?<!" + L + ")(?:no|nunca|jamás|ni|tampoco|nadie|nada|ningún|ninguno|ninguna|ningunos|ningunas|sin)(?!" + L + ")", "giu");
+  var DOBLE_NEG_RE = new RegExp("(?<!" + L + ")no\\s+(?:es|son|era|será|resulta|resultan|parece|está|están)\\s+(?:imposible|improbable|infrecuente|inusual|incorrect[oa]s?|innecesari[oa]s?|inválid[oa]s?|ilegal|ilegales|irrelevante|irrelevantes|inadecuad[oa]s?|desconocid[oa]s?|desfavorable|poco\\s+" + L + "+)(?!" + L + ")|(?<!" + L + ")no\\s+(?:deja|dejan|dejará)\\s+de(?!" + L + ")|(?<!" + L + ")no\\s+sin(?!" + L + ")", "giu");
+
+  // Datos clave: lo que una reescritura no debe perder ni cambiar.
+  var MESES = "enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre";
+  var DATOS = [
+    { name: "Fechas", re: new RegExp("(?<![\\d" + "\\p{L}])(?:\\d{1,2}[/.-]\\d{1,2}[/.-]\\d{2,4}|\\d{1,2}\\s+de\\s+(?:" + MESES + ")(?:\\s+de\\s+\\d{4})?)(?![\\d\\p{L}])", "giu") },
+    { name: "Horas", re: new RegExp("(?<![\\d\\p{L}])(?:de\\s+\\d{1,2}(?:[:.]\\d{2})?\\s+a\\s+\\d{1,2}(?:[:.]\\d{2})?\\s*(?:h|horas)|\\d{1,2}[:.]\\d{2}\\s*(?:h|horas)?|\\d{1,2}\\s*(?:h|horas))(?![\\d\\p{L}])", "giu") },
+    { name: "Plazos y duraciones", re: new RegExp("(?<![\\d\\p{L}])(?:\\d+|" + NUM_PAL + ")(?:\\s+(?:y\\s+)?(?:" + NUM_PAL + "))*\\s+(?:días\\s+(?:hábiles|naturales)|días|día|semanas|semana|meses|mes|años|año)(?![\\d\\p{L}])", "giu") },
+    { name: "Cantidades", re: new RegExp("(?<![\\d\\p{L}])\\d[\\d.,]*\\s*(?:€|euros?|%|por\\s+ciento)(?![\\p{L}])", "giu") },
+    { name: "Teléfonos", re: /(?<![\d+])(?:\+34\s?)?[6789]\d{2}(?:[\s.]?\d{3}[\s.]?\d{3}|[\s.]?\d{2}[\s.]?\d{2}[\s.]?\d{2})(?!\d)/g },
+    { name: "Correos y webs", re: /(?:[\w.+-]+@[\w-]+\.[\w.-]+|https?:\/\/[^\s)»"]+|www\.[^\s)»"]+)/gi }
+  ];
+  var OBLIGA_RE = new RegExp("(?<!" + L + ")(?:deberá|deberán|debe|deben|debes|tendrá\\s+que|tendrán\\s+que|tiene\\s+que|tienen\\s+que|tienes\\s+que|habrá\\s+de|habrán\\s+de|es\\s+obligatori[oa]|son\\s+obligatori[oa]s|está\\s+obligad[oa]|es\\s+necesari[oa]|hay\\s+que)(?!" + L + ")", "iu");
+
+  function datosClave(t, sents) {
+    var out = [];
+    DATOS.forEach(function (d) {
+      var seen = {}, list = [], m;
+      d.re.lastIndex = 0;
+      while ((m = d.re.exec(t))) {
+        var v = m[0].replace(/\s+/g, " ").replace(/[.,;:]+$/, "");
+        if (!seen[v.toLowerCase()]) { seen[v.toLowerCase()] = true; list.push(v); }
+      }
+      if (list.length) out.push({ name: d.name, items: list });
+    });
+    var ob = sents.filter(function (s) { return OBLIGA_RE.test(t.slice(s.start, s.end)); })
+      .map(function (s) { return snippet(t, s.start, s.end, 110); });
+    if (ob.length) out.push({ name: "Obligaciones", items: ob, long: true });
+    return out;
+  }
   var off = {};
 
   function analyze(t) {
@@ -940,7 +993,21 @@ footer.foot { max-width: none; }
       while ((mm = c.re.exec(t))) if (!c.no || !c.no.test(mm[0])) issues.push({ type: "construccion", start: mm.index, end: mm.index + mm[0].length, fix: c.fix });
     });
     SIGNOS_RE.lastIndex = 0;
-    while ((m = SIGNOS_RE.exec(t))) if (!SIGNOS_NO.test(m[0])) issues.push({ type: "signos", start: m.index, end: m.index + m[0].length });
+    while ((m = SIGNOS_RE.exec(t))) if (!SIGNOS_NO.test(m[0]) && !/^\.[\w-]/.test(t.slice(m.index + m[0].length))) issues.push({ type: "signos", start: m.index, end: m.index + m[0].length });
+    NUMERO_RE.lastIndex = 0;
+    while ((m = NUMERO_RE.exec(t))) issues.push({ type: "numero", start: m.index, end: m.index + m[0].length });
+    DOBLE_NEG_RE.lastIndex = 0;
+    var dobles = [];
+    while ((m = DOBLE_NEG_RE.exec(t))) { dobles.push(m.index); issues.push({ type: "negacion", start: m.index, end: m.index + m[0].length }); }
+    sents.forEach(function (s) {
+      var txt = t.slice(s.start, s.end), negs = [], mm;
+      NEG_RE.lastIndex = 0;
+      while ((mm = NEG_RE.exec(txt))) negs.push(mm);
+      if (negs.length >= 3) negs.forEach(function (g) {
+        var a = s.start + g.index;
+        if (dobles.indexOf(a) < 0) issues.push({ type: "negacion", start: a, end: a + g[0].length });
+      });
+    });
     NOMINAL_RE.lastIndex = 0;
     while ((m = NOMINAL_RE.exec(t))) issues.push({ type: "nominal", start: m.index, end: m.index + m[0].length });
     PASIVA_RE.lastIndex = 0;
@@ -986,6 +1053,8 @@ footer.foot { max-width: none; }
     if (it.type === "palabra") return " (palabra rebuscada; mejor: " + it.fix + ")";
     if (it.type === "construccion") return " (fórmula de estilo jurídico)";
     if (it.type === "signos") return " (arroba, equis o barra)";
+    if (it.type === "numero") return " (cifra escrita con letras)";
+    if (it.type === "negacion") return " (negación)";
     return "";
   }
 
@@ -1059,6 +1128,10 @@ footer.foot { max-width: none; }
     r.issues.forEach(function (it, i) { it.id = "av-" + i; });
     renderMarked(t, r);
     renderGroups(t, r);
+    var dk = datosClave(t, r.sents);
+    $("datos").innerHTML = dk.length ? dk.map(function (g) {
+      return "<div><dt>" + g.name + "</dt><dd" + (g.long ? ' class="dk-long"' : "") + ">" + g.items.map(function (v) { return "<span>" + esc(v) + "</span>"; }).join("") + "</dd></div>";
+    }).join("") : '<div class="empty">No hemos encontrado fechas, plazos, cantidades ni obligaciones.</div>';
 
     var hasScore = r.words >= 5 && r.P !== null;
     var P = hasScore ? Math.max(0, Math.min(100, r.P)) : null;
