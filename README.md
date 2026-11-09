@@ -10,3 +10,7 @@ Medidor gratuito de legibilidad y lenguaje claro para textos en español.
 - Analítica sin cookies con GoatCounter (eventos `legible-analizar`, `legible-ejemplo`, `legible-pro-me-interesa`, `legible-kofi-pie`).
 
 Es una ayuda orientativa. No evalúa el cumplimiento de la norma UNE 153101 de lectura fácil ni de ninguna otra norma.
+
+## Licencia
+
+© 2026 Jorge Rebate Serrano. Todos los derechos reservados. Puedes insertar la herramienta publicada en tu web citando la autoría y sin cobrar por ella; no se permite copiar, modificar ni usar el código con fines comerciales. Detalles en [LICENSE.md](LICENSE.md).
